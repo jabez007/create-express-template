@@ -1,0 +1,42 @@
+{
+  "name": "create-express-template",
+  "version": "1.0.0",
+  "description": "an ExpressJS initializer to use with `npm init`",
+  "bin": "./bin/index.js",
+  "main": "./src/index.js",
+  "scripts": {
+    "lint": "eslint --fix ./src/**/*.{js,jsx,ts}",
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jabez007/create-express-template.git"
+  },
+  "keywords": [
+    "npm",
+    "init",
+    "ExpressJS",
+    "initializer",
+    "project",
+    "template"
+  ],
+  "author": "Jimmy McCann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jabez007/create-express-template/issues"
+  },
+  "homepage": "https://github.com/jabez007/create-express-template#readme",
+  "devDependencies": {
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.4.0",
+    "mocha": "^10.6.0"
+  },
+  "dependencies": {
+    "~lib": "file:./src/lib",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0"
+  }
+}
