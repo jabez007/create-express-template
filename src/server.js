@@ -1,5 +1,5 @@
 const express = require('express')
-const morgan = require('~lib/morgan.js')
+const morgan = require('~utils/morgan.js')
 
 const app = express()
 
