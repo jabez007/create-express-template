@@ -45,11 +45,16 @@ async function main () {
   console.log('creating src directory')
   await mkdir(join(projectWorkingDirectory, 'src'))
 
-  console.log('creating index.js file')
-  fs.closeSync(fs.openSync(join(projectWorkingDirectory, 'src', 'index.js'), 'w'))
+  console.log('copying src directory')
+  await cp(join(__dirname, '..', 'src'), join(projectWorkingDirectory, 'src'), {
+    recursive: true
+  })
 
   console.log('updating main in package.json')
   await exec('npm pkg set main=./src/index.js')
+
+  console.log('adding alias for utils')
+  await exec('npm pkg set dependencies.~utils=file:./src/utils')
   /* #### END #### */
 
   /*
@@ -83,6 +88,13 @@ async function main () {
   /* #### END #### */
 
   /*
+   * install Winston
+   */
+  console.log('installing Winston (this may take a while)')
+  await exec('npm install winston')
+  /* #### END #### */
+
+  /*
    * install Express
    */
   console.log('installing ExpressJS (this may take a while)')
@@ -93,14 +105,6 @@ async function main () {
 
   console.log('installing Morgan (this may take a while)')
   await exec('npm install morgan')
-
-  console.log('adding alias for utils')
-  await exec('npm pkg set dependencies.~utils=file:./src/utils')
-
-  console.log('copying src directory')
-  await cp(join(__dirname, '..', 'src'), join(projectWorkingDirectory, 'src'), {
-    recursive: true
-  })
   /* #### END #### */
 
   /*
