@@ -122,6 +122,9 @@ async function main () {
   console.log('installing Mocha (this may take a while)')
   await exec('npm install --save-dev mocha')
 
+  console.log('installing node-mocks-http (this may take a while)')
+  await exec('npm install --save-dev node-mocks-http')
+
   console.log('copying test directory')
   await cp(join(__dirname, '..', 'test'), join(projectWorkingDirectory, 'test'), {
     recursive: true
