@@ -117,6 +117,12 @@ async function main () {
   /* #### END #### */
 
   /*
+   * install Swagger-JSDoc
+   */
+  console.log('installing swagger-jsdoc (this may take a while)')
+  await exec('npm install swagger-jsdoc')
+
+  /*
    * install Mocha
    */
   console.log('installing Mocha (this may take a while)')
