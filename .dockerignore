@@ -4,6 +4,8 @@
 npm-debug.log
 .coverage
 .coverage.*
+.env
+.env.*
 .aws
 
 **/bin
