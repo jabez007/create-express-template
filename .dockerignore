@@ -8,6 +8,7 @@ npm-debug.log
 .env.*
 .aws
 
+**/.vscode
 **/bin
 **/logs
 **/test
