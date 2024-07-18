@@ -8,6 +8,7 @@
     "prebuild:docker": "npm run lint",
     "build:docker": "docker build -t jabez07/create-express-template",
     "lint": "eslint --fix ./src/**/*.{js,jsx,ts}",
+    "serve:docker": "docker run --name create-express-template -p 80:8080 -d jabez07/create-express-template",
     "prestart": "npm run lint",
     "start": "node .",
     "start:docker": "node .",
