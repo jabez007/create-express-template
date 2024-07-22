@@ -24,6 +24,7 @@ spec:
       containers:
       - name: create-express-template
         image: jabez07/create-express-template:<git-hash>
+        imagePullPolicy: Always
         resources:
           limits:
             memory: 2.6Gi # 2.6 Gibibyte
