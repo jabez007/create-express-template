@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: create-express-template-deployment
+spec:
+  replicas: 2 # how many copies of each pod do we want?
+  strategy: # how do we want to update the pods?
+    type: 'RollingUpdate'
+    rollingUpdate: 
+      maxUnavailable: 50%
+      maxSurge: 50%
+  selector: # which pods are managed by this deployment?
+    matchLabels:
+      # must match ALL the labels set on the pod
+      app: create-express-template
+  #########
+  template: # here is where we describe the pod
+    metadata:
+      name: create-express-template-pod
+      labels:
+        # these are the labels that the Deployment and Service uses to find the correct pods
+        app: create-express-template
+    spec:
+      containers:
+      - name: create-express-template
+        image: jabez07/create-express-template:<git-hash>
+        resources:
+          limits:
+            memory: 2.6Gi # 2.6 Gibibyte
+            cpu: 500m # 0.5 CPU cores
+          request:
+            memory: 1.2Gi # 1.2 Gibibyte
+            cpu: 100m # 0.1 CPU cores
+        ports:
+        - containerPort: 8080
+        livenessProbe: # checks whether the container is still alive
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe: # checks whether the container is ready to receive traffic
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
