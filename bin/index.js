@@ -117,6 +117,16 @@ async function main () {
   /* #### END #### */
 
   /*
+   * install nodemon
+   */
+  console.log('installing nodemon (this may take a while)')
+  await exec('npm install --save-dev nodemon')
+
+  console.log('adding serve to scripts in package.json')
+  await exec('npm pkg set scripts.serve="nodemon --watch src -e js,jsx --exec npm run start"')
+  /* #### END #### */
+
+  /*
    * install Swagger-JSDoc
    */
   console.log('installing swagger-jsdoc (this may take a while)')
