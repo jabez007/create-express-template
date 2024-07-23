@@ -1,3 +1,7 @@
+/**
+ * This file should be limited to building the Express server itself
+ * i.e. Middleware and Routes
+ */
 const express = require('express')
 const Logger = require('~utils/winston')
 const requestId = require('~utils/request-id')
