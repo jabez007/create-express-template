@@ -24,27 +24,30 @@ spec:
         app: create-express-template
     spec:
       containers:
-      - name: create-express-template
-        image: jabez07/create-express-template:<git-hash>
-        imagePullPolicy: Always
-        resources:
-          limits:
-            memory: 2662Mi # 2.6 Gibibyte
-            cpu: 500m # 0.5 CPU cores
-          requests:
-            memory: 1228Mi # 1.2 Gibibyte
-            cpu: 100m # 0.1 CPU cores
-        ports:
-        - containerPort: 8080
-        livenessProbe: # checks whether the container is still alive
-          httpGet:
-            path: /ping
-            port: 8080
-          initialDelaySeconds: 15
-          periodSeconds: 10
-        readinessProbe: # checks whether the container is ready to receive traffic
-          httpGet:
-            path: /ping
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: create-express-template
+          image: jabez07/create-express-template:<git-hash>
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 2662Mi # 2.6 Gibibyte
+              cpu: 500m # 0.5 CPU cores
+            requests:
+              memory: 1228Mi # 1.2 Gibibyte
+              cpu: 100m # 0.1 CPU cores
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: create-express-template-config
+          livenessProbe: # checks whether the container is still alive
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe: # checks whether the container is ready to receive traffic
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
