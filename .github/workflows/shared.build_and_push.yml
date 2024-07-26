@@ -30,7 +30,8 @@ jobs:
           context: .
           push: true
           # GITHUB_REPOSITORY = The owner and repository name. For example, octocat/Hello-World.
-          tags: ${{ github.repository }}:${{ github.sha }} # octocat/Hello-World:ffac537e6cbbf934b08745a378932722df287a53
+          # ghcr.io prefix makes sure we are pushing to GHCR
+          tags: ghcr.io/${{ github.repository }}:${{ github.sha }} # octocat/Hello-World:ffac537e6cbbf934b08745a378932722df287a53
 
       - name: Post cleanup
         run: docker image prune -f
