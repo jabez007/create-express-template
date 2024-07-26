@@ -1,0 +1,15 @@
+name: Run Shared Test Workflow
+
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  run_tests:
+    uses: jabez007/create-express-template/.github/workflows/shared/test.yml
+    secrets: inherit
