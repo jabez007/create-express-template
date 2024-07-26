@@ -1,0 +1,36 @@
+name: Build and Push Docker Image to GHCR
+
+on:
+  workflow_call:
+    
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }} # The name of the person or app that initiated the workflow. For example, octocat.
+          password: ${{ secrets.GITHUB_TOKEN }} # automatically provided by GitHub Actions, so you don't need to create it manually.
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          # GITHUB_REPOSITORY = The owner and repository name. For example, octocat/Hello-World.
+          tags: ${{ github.repository }}:${{ github.sha }} # octocat/Hello-World:ffac537e6cbbf934b08745a378932722df287a53
+
+      - name: Post cleanup
+        run: docker image prune -f
