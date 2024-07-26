@@ -1,0 +1,15 @@
+name: Run Shared Build and Push Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build_and_push:
+    permissions:
+      contents: read
+      packages: write
+    uses: jabez007/create-express-template/.github/workflows/shared.build_and_push.yml@master
+    secrets: inherit
