@@ -7,6 +7,9 @@ on:
       - master
 
 jobs:
-  run_tests:
+  build_and_push:
+    permissions:
+      contents: read
+      packages: write
     uses: jabez007/create-express-template/.github/workflows/shared.build_and_push.yml@master
     secrets: inherit
