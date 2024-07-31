@@ -1,9 +1,10 @@
 name: Run Shared Build Workflow
 
 on:
-  push:
+  pull_request:
     branches:
-      - development
+      - main
+      - master
 
 jobs:
   build:
