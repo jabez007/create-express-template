@@ -5,11 +5,18 @@ on:
     branches:
       - main
       - master
+    paths:
+      - 'package.json'
+      - 'src/**'
+      - 'Dockerfile'
+      - '.dockerignore'
 
 jobs:
   build_and_push:
     permissions:
       contents: read
-      packages: write
+      packages: write # required if push is true
     uses: jabez007/create-express-template/.github/workflows/shared.build_and_push.yml@master
+    with:
+      push: true
     secrets: inherit
