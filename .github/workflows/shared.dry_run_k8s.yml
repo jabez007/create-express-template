@@ -2,6 +2,10 @@ name: Dry Run Kubernetes Apply
 
 on:
   workflow_call:
+    inputs:
+      env_files:
+        type: string
+        default: .env
     
 jobs:
   dry-run-k8s:
@@ -11,6 +15,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
     
+      - name: Environment Files
+        id: config_envs
+        run: |
+          input_list = "${{ inputs.env_files }}"
+          IFS = ',' read -ra env_files <<< "$input_list"
+          output = ""
+          for env_file in "${env_files[@]}"; do
+            output += "--from-env-file $env_file "
+          done
+          output = $(echo "$output" | sed 's/ $//')
+          echo "from_files=$output" >> "$GITHUB_OUTPUT"
+
       - name: Update deployment manifest
         if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
         run: sed -i 's|CONTAINER_IMAGE|ghcr.io/${{ github.repository }}:latest|g' k8s/deployment.yaml
@@ -28,8 +44,7 @@ jobs:
         run: minikube start
       
       - name: Generate configmap
-        if: ${{ hashFiles('.env') != '' }}
-        run: kubectl create configmap ${{ github.event.repository.name }}-config --from-env-file .env -o yaml --dry-run=client
+        run: kubectl create configmap ${{ github.event.repository.name }}-config ${{ steps.config_envs.outputs.from_files }} -o yaml --dry-run=client
 
       - name: Dry run deployment
         if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
