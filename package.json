@@ -1,5 +1,5 @@
 {
-  "name": "create-express-template",
+  "name": "@jabez007/create-express-template",
   "version": "1.0.0",
   "description": "an ExpressJS initializer to use with `npm init`",
   "bin": "./bin/index.js",
