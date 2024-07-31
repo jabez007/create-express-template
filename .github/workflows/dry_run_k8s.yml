@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - development
+    paths:
+      - 'k8s/**'
+  pull_request:
+    branches:
+      - main
+      - master
 
 jobs:
   dry_run_k8s:
