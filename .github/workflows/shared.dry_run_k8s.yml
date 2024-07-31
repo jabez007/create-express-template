@@ -18,12 +18,12 @@ jobs:
       - name: Environment Files
         id: config_envs
         run: |
-          IFS = ',' read -ra env_files <<< "${{ inputs.env_files }}"
-          output = ""
+          IFS=',' read -ra env_files <<< "${{ inputs.env_files }}"
+          output=""
           for env_file in "${env_files[@]}"; do
-            output += "--from-env-file $env_file "
+            output+="--from-env-file $env_file "
           done
-          output = $(echo "$output" | sed 's/ $//')
+          output=$(echo "$output" | sed 's/ $//')
           echo "from_files=$output" >> "$GITHUB_OUTPUT"
 
       - name: Update deployment manifest
