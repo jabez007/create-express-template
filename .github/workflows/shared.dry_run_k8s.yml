@@ -18,8 +18,7 @@ jobs:
       - name: Environment Files
         id: config_envs
         run: |
-          input_list = "${{ inputs.env_files }}"
-          IFS = ',' read -ra env_files <<< "$input_list"
+          IFS = ',' read -ra env_files <<< "${{ inputs.env_files }}"
           output = ""
           for env_file in "${env_files[@]}"; do
             output += "--from-env-file $env_file "
