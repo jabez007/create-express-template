@@ -28,6 +28,10 @@ jobs:
           output=$(echo "$output" | sed 's/ $//')
           echo "from_files=$output" >> "$GITHUB_OUTPUT"
 
+      - name: Show formatted env files
+        if: ${{ vars.PIPELINE_DEBUG == 'true' }}
+        run: echo "${{ steps.config_envs.outputs.from_files }}"
+
       - name: Update deployment manifest
         if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
         run: sed -i 's|CONTAINER_IMAGE|ghcr.io/${{ github.repository }}:latest|g' k8s/deployment.yaml
