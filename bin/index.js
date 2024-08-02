@@ -104,6 +104,13 @@ async function main () {
   /* #### END #### */
 
   /*
+   * install Axios
+   */
+  console.log('installing Axios (this may take a while)')
+  await exec('npm install axios')
+  /* #### END #### */
+
+  /*
    * install Express
    */
   console.log('installing ExpressJS (this may take a while)')
@@ -148,7 +155,7 @@ async function main () {
   })
 
   console.log('adding test to scripts in package.json')
-  await exec('npm pkg set scripts.test=mocha')
+  await exec('npm pkg set scripts.test="NODE_ENV=test mocha"')
   /* #### END #### */
 
   /*
