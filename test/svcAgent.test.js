@@ -12,7 +12,7 @@ describe('svcAgent Constructor', () => {
     })
 
     it('injects the X-Request-Id header outbound', () => {
-        const client = svcAgent()({ expressRequest: req })
+        const client = svcAgent()(req)
         
         assert.equal(client.defaults.headers['X-Request-Id'], 'foobar')
     })
@@ -26,7 +26,7 @@ describe('svcAgent Constructor', () => {
                     } 
                 }
             }
-        )({ expressRequest: req })
+        )(req)
         
         assert.equal(client.defaults.headers['X-Custom-Header'], 'Hello World')
         assert.equal(client.defaults.headers['X-Request-Id'], 'foobar')
@@ -39,14 +39,14 @@ describe('svcAgent Constructor', () => {
                     baseURL: "https://some-domain.com/api/"
                 }
             }
-        )({ expressRequest: req })
+        )(req)
         
         assert.equal(client.defaults.baseURL, 'https://some-domain.com/api/')
         assert.equal(client.defaults.headers['X-Request-Id'], 'foobar')
     })
 
     it('injects the X-svc2svc-Id header outbound', () => {
-        const client = svcAgent()({ expressRequest: req })
+        const client = svcAgent()(req)
         const axiosRequest = client.interceptors.request.handlers[0].fulfilled({
             headers: new axios.AxiosHeaders(client.defaults.headers)
         })

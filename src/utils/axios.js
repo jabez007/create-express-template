@@ -11,9 +11,7 @@ module.exports = function svcAgent ({
   generator = generateV4UUID,
   axiosConfig = {}
 } = {}) {
-  return function ({
-    expressRequest = {}
-  } = {}) {
+  return function (expressRequest) {
     const debug = process.env.NODE_ENV === 'test' ? () => {} : expressRequest.logger?.debug || console.log
     const error = process.env.NODE_ENV === 'test' ? () => {} : expressRequest.logger?.error || console.error
 
