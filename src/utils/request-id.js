@@ -7,7 +7,7 @@ function generateV4UUID (_request) {
 const ATTRIBUTE_NAME = 'id'
 
 /**
- * Create an Express middleware function to inject an "id" in to each incoming request
+ * Creates an Express middleware function to inject an "id" in to each incoming request
  * @param {Object} param0
  * @param {function(ExpressRequest): string} param0.generator - A function to generate the unique Id for the incoming request
  * @param {string} param0.headerName - Which header to look for in the incoming request for a unique Id

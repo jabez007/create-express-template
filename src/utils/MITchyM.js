@@ -10,7 +10,7 @@ const express = require('express')
  */
 
 /**
- * Generate a MITchyM Router
+ * Generates a MITchyM Router
  * @param {Object} param0
  * @param {Object[]} param0.methods - The methods, paths, and callbacks for this level of the router
  * @param {string} param0.methods[].name - The HTTP method (POST, GET, PUT, PATCH, DELETE) that will invoke the callbacks
