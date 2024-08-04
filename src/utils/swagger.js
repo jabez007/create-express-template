@@ -9,7 +9,8 @@ const options = {
     }
   },
   apis: [ // files containing Swagger/OpenAPI annotations in JSDoc comments
-    './src/routes/**/*.js'
+    './src/routes/**/*.js',
+    './src/models/**/*.js'
   ]
 }
 

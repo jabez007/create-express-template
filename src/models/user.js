@@ -1,5 +1,43 @@
 const userClient = require('~databases/swapi')
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         birthYear:
+ *           type: string
+ *           example: 19 BBY
+ *         eyeColor:
+ *           type: string
+ *           example: Blue
+ *         gender:
+ *           type: string
+ *           example: Male
+ *         hairColor:
+ *           type: string
+ *           example: blonde
+ *         height:
+ *           type: string
+ *           example: 172 cm
+ *         mass:
+ *           type: string
+ *           example: 77 kg
+ *         name:
+ *           type: string
+ *           example: Luke Skywalker
+ *         skinColor:
+ *           type: string
+ *           example: fair
+ *         created:
+ *           type: string
+ *           format: date-time
+ *         edited:
+ *           type: string
+ *           format: date-time
+ */
 module.exports = class User {
   constructor ({
     birth_year, // eslint-disable-line camelcase

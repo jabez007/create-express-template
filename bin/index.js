@@ -140,10 +140,13 @@ async function main () {
   /* #### END #### */
 
   /*
-   * install Swagger-JSDoc
+   * install Swagger/OpenAPI
    */
-  console.log('installing swagger-jsdoc (this may take a while)')
+  console.log('installing Swagger JSdoc (this may take a while)')
   await exec('npm install swagger-jsdoc')
+
+  console.log('installing Swagger UI Express (this may take a while)')
+  await exec('npm install swagger-ui-express')
   /* #### END #### */
 
   /*
