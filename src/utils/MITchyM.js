@@ -48,7 +48,7 @@ module.exports = ({
     fs.readdirSync(dirname)
       .filter((file) => fs.lstatSync(join(dirname, file)).isDirectory())
       .forEach((subdir) => {
-        router.use(`/${paramsPath}/${subdir}`, require(join(dirname, subdir)))
+        router.use(`/${paramsPath}${subdir}`, require(join(dirname, subdir)))
       })
   }
 

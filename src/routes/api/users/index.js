@@ -1,3 +1,5 @@
+const User = require('~models/user')
+
 module.exports = require('~utils/MITchyM')({
   dirname: __dirname,
   methods: [
@@ -6,20 +8,39 @@ module.exports = require('~utils/MITchyM')({
        * @openapi
        * /users:
        *   get:
-       *     description: Welcome to swagger-jsdoc!
+       *     description: Search for specified User records
        *     responses:
        *       200:
-       *         description: Returns a mysterious string.
+       *         description: Returns JSON object for the found User records
        */
       name: ' GET ',
       path: '/',
       callbacks: (req, res) => {
-        req.logger.error('This is an error log')
-        req.logger.warn('This is a warn log')
-        req.logger.info('This is a info log')
-        req.logger.debug('This is a debug log')
+        req.logger.debug(`Requested User: ${req.params.id}`)
 
-        res.send('hello world')
+        res.json({
+          found: []
+        })
+      }
+    },
+    {
+      /**
+       * @openapi
+       * /users/{id}:
+       *   get:
+       *     description: Fetches record for specified User
+       *     responses:
+       *       200:
+       *         description: Returns JSON object for specified User record
+       */
+      name: ' GET ',
+      path: '/:id',
+      callbacks: (req, res) => {
+        req.logger.debug(`Requested User: ${req.params.id}`)
+
+        res.json(
+          User.get(req.params.id)
+        )
       }
     }
   ]
