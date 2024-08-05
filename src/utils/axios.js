@@ -36,7 +36,7 @@ module.exports = function svcAgent ({
 
     client.interceptors.request.use((req) => {
       req.headers.set(svcIdHeader, generator(expressRequest))
-      debug(`${JSON.stringify(req, null, 2)}`)
+      debug('sending request', { axios: req })
       return req
     }, (err) => {
       error(err)
@@ -44,10 +44,12 @@ module.exports = function svcAgent ({
     })
 
     client.interceptors.response.use((res) => {
-      debug(`${JSON.stringify({
-            header: res.headers,
-            data: res.data
-            }, null, 2)}`)
+      debug('received response', {
+        axios: {
+          header: res.headers,
+          data: res.data
+        }
+      })
       return res
     }, (err) => {
       error(err)

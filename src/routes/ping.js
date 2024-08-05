@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 router.get('/', (req, res) => {
-  req.logger.debug(`Ping ${JSON.stringify(req.query, null, 2)}`)
+  req.logger.debug('Ping', { queryParams: req.query })
   /*
    * Do something here to check if this service is functioning properly
    * If this service should be seen a unavailable,

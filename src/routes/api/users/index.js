@@ -51,8 +51,8 @@ module.exports = require('~utils/MITchyM')({
         } catch (err) {
           req.logger.error(err)
           res
-            .status(err.response.status)
-            .json(err.response.data)
+            .status(err.response?.status || 500)
+            .json(err.response?.data || err)
         }
       }
     }
