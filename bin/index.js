@@ -107,6 +107,12 @@ async function main () {
    */
   console.log('installing Winston (this may take a while)')
   await exec('npm install winston')
+
+  console.log('installing uuid (this may take a while)')
+  await exec('npm install uuid')
+
+  console.log('installing Short Unique Id (this may take a while)')
+  await exec('npm install short-unique-id')
   /* #### END #### */
 
   /*
@@ -121,9 +127,6 @@ async function main () {
    */
   console.log('installing ExpressJS (this may take a while)')
   await exec('npm install express')
-
-  console.log('installing uuid (this may take a while)')
-  await exec('npm install uuid')
 
   console.log('installing Morgan (this may take a while)')
   await exec('npm install morgan')
