@@ -1,4 +1,4 @@
-const userClient = require('~databases/swapi')
+const userClient = require('~connections/swapi')
 
 /**
  * @openapi
