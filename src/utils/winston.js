@@ -72,7 +72,7 @@ const format = () => {
 }
 
 // Define which transports the logger must use to print out messages.
-// In this example, we are using three different transports
+// In this example, we are using two different transports
 const defaultTransports = [
   // Allow the use of the console to print all messages
   new winston.transports.Console(),
@@ -84,6 +84,8 @@ const defaultTransports = [
 ]
 
 module.exports = (transports = defaultTransports) => {
+  const env = process.env.NODE_ENV || 'development'
+
   // Create the logger instance that has to be exported
   // and used to log messages.
   return winston.createLogger({
@@ -93,6 +95,9 @@ module.exports = (transports = defaultTransports) => {
     },
     levels,
     format: format(),
-    transports
+    transports,
+    exceptionHandlers: transports,
+    rejectionHandlers: transports,
+    exitOnError: env !== 'development'
   })
 }
