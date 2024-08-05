@@ -7,7 +7,7 @@ describe('svcAgent Constructor', () => {
 
     beforeEach(() => {
         req = {
-            id: 'foobar'
+            traceId: 'foobar'
         }
     })
 

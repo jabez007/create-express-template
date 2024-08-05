@@ -4,30 +4,59 @@ function generateV4UUID (_request) {
   return v4()
 }
 
-const ATTRIBUTE_NAME = 'id'
+const TRACE_ATTRIBUTE_NAME = 'traceId'
+const SPAN_ATTRIBUTE_NAME = 'spanId'
 
 /**
  * Creates an Express middleware function to inject an "id" in to each incoming request
  * @param {Object} param0
- * @param {function(ExpressRequest): string} param0.generator - A function to generate the unique Id for the incoming request
- * @param {string} param0.headerName - Which header to look for in the incoming request for a unique Id
- * @param {boolean} param0.setHeader - Should the outgoing response include the header for the unique Id?
+ * @param {Object} param0.trace - An object for configuring how traceId is passed around.
+ * @param {function(ExpressRequest): string} param0.trace.generator - A function to generate the Trace Id if missing from an incoming request
+ * @param {string} param0.trace.headerName - Which header to look for in the incoming request for the Trace Id
+ * @param {boolean} param0.trace.setHeader - Should the outgoing response include the header for the Trace Id?
+ * @param {Object} param0.span - An object for configuring how spanId is passed around.
+ * @param {string} param0.span.headerName - Which header to look for in the incoming request for the Span Id
+ * @param {boolean} param0.span.setHeader - Should the outgoing response include the header for the Span Id?
  * @returns {function(ExpressRequest, ExpressResponse, ExpressNextFunction): void} - The middleware function to be passed to Express
  */
 module.exports = function requestId ({
-  generator = generateV4UUID,
-  headerName = 'X-Request-Id',
-  setHeader = true
+  trace = {
+    generator: generateV4UUID,
+    headerName: 'X-Request-Id',
+    setHeader: true
+  },
+  span = {
+    headerName: 'X-svc2svc-Id',
+    setHeader: true
+  }
 } = {}) {
   return function (request, response, next) {
-    const oldValue = request.get(headerName)
-    const id = oldValue === undefined ? generator(request) : oldValue
+    /*
+     * Trace Id
+     */
+    const incomingTraceId = request.get(trace.headerName)
+    const traceId = incomingTraceId === undefined ? trace.generator(request) : incomingTraceId
 
-    if (setHeader) {
-      response.set(headerName, id)
+    if (trace.setHeader) {
+      response.set(trace.headerName, traceId)
     }
 
-    request[ATTRIBUTE_NAME] = id
+    request[TRACE_ATTRIBUTE_NAME] = traceId
+    /* END Trace Id */
+
+    /*
+     * Span Id
+     */
+    const incomingSpanId = request.get(span.headerName)
+
+    if (incomingSpanId) {
+      request[SPAN_ATTRIBUTE_NAME] = incomingSpanId
+
+      if (span.setHeader) {
+        response.set(span.headerName, incomingSpanId)
+      }
+    }
+    /* END Span Id */
 
     next()
   }

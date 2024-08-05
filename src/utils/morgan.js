@@ -10,8 +10,12 @@ const skip = () => {
   return env === 'test'
 }
 
-morgan.token('reqId', function (req, res) {
-  return req.id
+morgan.token('traceId', function (req, res) {
+  return req.traceId
+})
+
+morgan.token('spanId', function (req, res) {
+  return req.spanId
 })
 
 module.exports = (logger) => {
@@ -24,7 +28,8 @@ module.exports = (logger) => {
       // '[:reqid] :method :url',
       function (tokens, req, res) {
         return JSON.stringify({
-          reqId: tokens.reqId(req, res),
+          traceId: tokens.traceId(req, res),
+          spanId: tokens.spanId(req, res),
           method: tokens.method(req, res),
           url: tokens.url(req, res)
         })
@@ -49,7 +54,8 @@ module.exports = (logger) => {
       // '[:reqid] :status :res[content-length] - :response-time ms',
       function (tokens, req, res) {
         return JSON.stringify({
-          reqId: tokens.reqId(req, res),
+          traceId: tokens.traceId(req, res),
+          spanId: tokens.spanId(req, res),
           status: Number.parseFloat(tokens.status(req, res)),
           contentLength: tokens.res(req, res, 'content-length'),
           responseTime: Number.parseFloat(tokens['response-time'](req, res))

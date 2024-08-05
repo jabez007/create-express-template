@@ -8,24 +8,25 @@ function generateV4UUID (_request) {
 /**
  * Gives a function for creating Axios instances specific to an Express request to facilitate tracing across interconnected microservices
  * @param {Object} param0
- * @param {string} param0.headerName - The header to include in all outgoing requests to connect all the microservices calls that were trigger by a single inbound request
- * @param {string} param0.svcIdHeader - The header to include in all outgoing requests to track the individual calls one microservice makes to another
- * @param {function(ExpressRequest): string} param0.generator - A function to generate the unique Id for the svcIdHeader
+ * @param {string} param0.traceIdHeader - The header to include in all outgoing requests to connect all the microservices calls that were trigger by a single inbound request
+ * @param {string} param0.spanIdHeader - The header to include in all outgoing requests to track the individual calls one microservice makes to another
+ * @param {function(ExpressRequest): string} param0.generator - A function to generate the unique Id for the spanIdHeader
  * @param {AxiosConfig} param0.axiosConfig - An Axios config object to pass to axios.create
  * @returns {function(ExpressRequest): AxiosInstance} - A function to use in the Express route handlers to create any needed Axios instances
  */
 module.exports = function svcAgent ({
-  headerName = 'X-Request-Id',
-  svcIdHeader = 'X-svc2svc-Id',
+  traceIdHeader = 'X-Request-Id',
+  spanIdHeader = 'X-svc2svc-Id',
   generator = generateV4UUID,
   axiosConfig = {}
 } = {}) {
   return function (expressRequest) {
     const debug = process.env.NODE_ENV === 'test' ? () => {} : expressRequest.logger?.debug || console.log
+    const info = process.env.NODE_ENV === 'test' ? () => {} : expressRequest.logger?.info || console.log
     const error = process.env.NODE_ENV === 'test' ? () => {} : expressRequest.logger?.error || console.error
 
     const defaultHeaders = new axios.AxiosHeaders(axiosConfig.headers)
-    defaultHeaders.set(headerName, expressRequest.id || generator(expressRequest))
+    defaultHeaders.set(traceIdHeader, expressRequest.traceId)
 
     const client = axios.create({
       ...axiosConfig,
@@ -35,7 +36,9 @@ module.exports = function svcAgent ({
     })
 
     client.interceptors.request.use((req) => {
-      req.headers.set(svcIdHeader, generator(expressRequest))
+      const spanId = generator(expressRequest)
+      info(`sending request ${spanId}`)
+      req.headers.set(spanIdHeader, spanId)
       debug('sending request', { axios: req })
       return req
     }, (err) => {
@@ -50,6 +53,10 @@ module.exports = function svcAgent ({
           data: res.data
         }
       })
+      const spanId = res.headers[spanIdHeader]
+      if (spanId) {
+        info(`received response ${spanId}`)
+      }
       return res
     }, (err) => {
       error(err)
