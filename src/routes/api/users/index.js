@@ -6,7 +6,7 @@ module.exports = require('~utils/MITchyM')({
     {
       /**
        * @openapi
-       * /users:
+       * /api/users:
        *   get:
        *     description: Search for specified User records
        *     responses:
@@ -26,7 +26,7 @@ module.exports = require('~utils/MITchyM')({
     {
       /**
        * @openapi
-       * /users/{userId}:
+       * /api/users/{userId}:
        *   parameters:
        *     - $ref: '#/components/parameters/userId'
        *   get:
