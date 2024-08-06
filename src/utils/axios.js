@@ -53,12 +53,14 @@ module.exports = function svcAgent ({
     client.interceptors.response.use((res) => {
       debug('received response', {
         axios: {
+          request: res.config,
           status: res.status,
+          statusText: res.statusText,
           headers: res.headers,
           data: res.data
         }
       })
-      const spanId = res.headers[spanIdHeader]
+      const spanId = res.headers[spanIdHeader] || res.config.headers[spanIdHeader]
       if (spanId) {
         info(`received response ${spanId}`, { childSpanId: spanId })
       }
