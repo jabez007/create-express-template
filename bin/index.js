@@ -54,7 +54,7 @@ async function main () {
   await exec('npm pkg set main=./src/index.js')
 
   console.log('adding start to scripts in package.json')
-  await exec('npm pkg set scripts.start="node ."')
+  await exec('npm pkg set scripts.start="node -r dotenv/config ."')
 
   console.log('adding alias for utils')
   await exec('npm pkg set dependencies.~utils=file:./src/utils')
@@ -99,7 +99,7 @@ async function main () {
    * install dotENV
    */
   console.log('installing dotENV (this may take a while)')
-  await exec('npm install dotenv')
+  await exec('npm install --save-dev dotenv')
 
   console.log('writing .env file')
   await writeFile(join(projectWorkingDirectory, '.env'), 'PORT=8080')
