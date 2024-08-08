@@ -1,6 +1,6 @@
 # create-express-template
 
-A starter template for initializing Node.js projects using (npm init)[https://docs.npmjs.com/cli/v10/commands/npm-init],
+A starter template for initializing Node.js projects using [npm init](https://docs.npmjs.com/cli/v10/commands/npm-init),
 designed to establish a consistent foundation for API microservices with Express.js.
 This template provides a standardized setup that simplifies the implementation of
 specific project requirements and accelerates development.
