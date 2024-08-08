@@ -5,7 +5,7 @@ designed to establish a consistent foundation for API microservices with Express
 This template provides a standardized setup that simplifies the implementation of
 specific project requirements and accelerates development.
 
-## middlewares
+## Middlewares
 
 This template comes pre-configured with essential middleware components to streamline development and enhance the functionality of your API.
 These middlewares facilitate efficient logging, intuitive routing, and comprehensive API documentation.
@@ -22,7 +22,7 @@ allowing you to focus on building out your specific application logic.
 
 ### MITchyM
 
-## helpers
+## Helpers
 
 To ensure seamless communication between microservices,
 this template includes specialized helper modules designed to enrich outgoing requests with essential metadata.
