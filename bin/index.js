@@ -154,6 +154,12 @@ async function main () {
   console.log('installing Swagger JSdoc (this may take a while)')
   await exec('npm install swagger-jsdoc')
 
+  console.log('installing Swagger Parser (this may take a while)')
+  await exec('npm install swagger-parser')
+
+  console.log('installing Path to Regexp (this may take a while)')
+  await exec('npm install path-to-regexp')
+
   console.log('installing Swagger UI Express (this may take a while)')
   await exec('npm install swagger-ui-express')
   /* #### END #### */
