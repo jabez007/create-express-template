@@ -1,0 +1,14 @@
+name: Apply Kubernetes Manifests to Cluster
+description: ''
+
+inputs:
+  dry_run:
+    description: ''
+    default: 'true'
+  debug:
+    description: Whether or not to display debug output
+    default: "false"
+
+runs:
+  using: composite
+  steps:

@@ -1,0 +1,70 @@
+name: Create Kubernetes configmap manifest
+description: uses various .env files
+
+inputs:
+  env_files:
+    description: "example: '.env , .env.common , .env.development'"
+  secrets:
+    description: "pass in as 'toJson(secrets)'"
+  debug:
+    description: Whether or not to display debug output
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Environment Files
+      id: config_envs
+      run: |
+        IFS=',' read -ra env_files <<< "${{ inputs.env_files }}"
+        output=""
+        for env_file in "${env_files[@]}"; do
+          trimmed_env_file=$(echo "$env_file" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          if [ -f "$trimmed_env_file" ]; then
+            output+="--from-env-file $trimmed_env_file "
+          fi
+        done
+        output=$(echo "$output" | sed 's/ $//')
+        echo "from_files=$output" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Show formatted env files
+      if: ${{ inputs.debug == 'true' }}
+      run: echo "${{ steps.config_envs.outputs.from_files }}"
+      shell: bash
+
+    - name: Write configmap
+      if: ${{ steps.config_envs.outputs.from_files != '' }}
+      run: kubectl create configmap ${{ github.event.repository.name }}-config ${{ steps.config_envs.outputs.from_files }} -o yaml --dry-run=client > k8s/configmap.yaml
+      shell: bash
+
+    # https://unix.stackexchange.com/questions/482517/why-does-this-while-loop-not-recognize-the-last-line
+    # https://unix.stackexchange.com/questions/31947/how-to-add-a-newline-to-the-end-of-a-file
+    - name: Append trailing newline to configmap
+      if: ${{ hashFiles('k8s/configmap.yaml') != '' }}
+      run: sed -i -e '$a\' k8s/configmap.yaml
+      shell: bash
+
+    # Use caution when modifying this section; it's pretty much a couple of rube goldbergs duct taped together
+    - name: Inject secrets into configmap
+      if: ${{ hashFiles('k8s/configmap.yaml') != '' && inputs.secrets != '' }}
+      env:
+        GH_SECRETS: ${{ inputs.secrets }}
+      run: |
+        regex="@@(.+)@@"
+        while read -r line ; do
+        if [[ $line =~ $regex ]] ; then
+        echo "Found: $line"
+        export VARIABLE_NAME=${BASH_REMATCH[1]}
+        echo "Env variable name: $VARIABLE_NAME"
+        echo "Value of variable: $(echo $GH_SECRETS | jq -r .$VARIABLE_NAME)"
+        echo "Replacing @@$VARIABLE_NAME@@ with $(echo $GH_SECRETS | jq -r .$VARIABLE_NAME)"
+        sed -i "s|@@$VARIABLE_NAME@@|$(echo $GH_SECRETS | jq -r .$VARIABLE_NAME)|" k8s/configmap.yaml
+        fi
+        done < k8s/configmap.yaml
+      shell: bash
+
+    - name: Display configmap
+      if: ${{ hashFiles('k8s/configmap.yaml') != '' && inputs.debug == 'true' }}
+      run: cat k8s/configmap.yaml
+      shell: bash
