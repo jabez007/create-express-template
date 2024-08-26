@@ -40,7 +40,7 @@ module.exports = require('~utils/MITchyM')({
        *               $ref: '#/components/schemas/User'
        */
       name: ' GET ',
-      path: '/:userId',
+      path: '/:userId([0-9]{1,2})',
       callbacks: async (req, res) => {
         req.logger.debug(`Requested User: ${req.params.userId}`)
 
