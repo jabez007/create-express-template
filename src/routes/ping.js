@@ -4,10 +4,10 @@ const router = express.Router()
 router.get('/', (req, res) => {
   req.logger.debug(`Ping ${JSON.stringify(req.query, null, 2)}`)
   /*
-     * Do something here to check if this service is functioning properly
-     * If this service should be seen a unavailable,
-     * then the returned HTTP status code should be 5xx
-     */
+   * Do something here to check if this service is functioning properly
+   * If this service should be seen a unavailable,
+   * then the returned HTTP status code should be 5xx
+   */
   res.json({
     appName: process.env.npm_package_name,
     appVersion: '', // API version?
