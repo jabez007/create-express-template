@@ -12,11 +12,35 @@ on:
       - '.dockerignore'
 
 jobs:
+  version_app:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Run version script
+        run: npm run version:short
+
+      - name: Upload version artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: short-version
+          path: src/version.log
+
   build_and_push:
+    needs: version_app
     permissions:
       contents: read
       packages: write # required if push is true
     uses: jabez007/create-express-template/.github/workflows/shared.build_and_push.yml@master
     with:
+      artifact-name: short-version
+      artifact-path: src/version.log
       push: true
     secrets: inherit

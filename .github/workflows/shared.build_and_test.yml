@@ -17,13 +17,13 @@ jobs:
       - name: Build Docker image
         run: docker build -t test-image .
 
-      - name: Run Docker Container
+      - name: Run Docker container
         id: container_run
         run: |
           CONTAINER_ID=$(docker run -d -p 80:8888 test-image | tail -n 1)
           echo "CONTAINER_ID=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
 
-      - name: Test Docker Container
+      - name: Test Docker container
         run: |
           sleep 10
           if curl --fail http://localhost/ping; then
@@ -33,7 +33,7 @@ jobs:
             exit 1
           fi
 
-      - name: Stop and Remove Docker Container
+      - name: Stop and remove Docker container
         if: always()
         run: |
           docker stop ${{ steps.container_run.outputs.CONTAINER_ID }}
