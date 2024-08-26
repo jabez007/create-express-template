@@ -10,7 +10,7 @@ module.exports = {
     // The message format is made from tokens, and each token is
     // defined inside the Morgan library.
     // You can create your custom token to show what do you want from a request.
-    ':reqid :method :url',
+    '[:reqid] :method :url',
     // Options:
     // { stream, skip }
     {
@@ -22,7 +22,7 @@ module.exports = {
     // The message format is made from tokens, and each token is
     // defined inside the Morgan library.
     // You can create your custom token to show what do you want from a request.
-    ':reqid :status :res[content-length] - :response-time ms'
+    '[:reqid] :status :res[content-length] - :response-time ms'
     // Options:
     // { stream, skip }
   )
