@@ -74,27 +74,29 @@ module.exports = function createValidationMiddleware (_apiSpec) {
 
   // Middleware function to validate requests
   return (req, res, next) => {
-    const error = process.env.NODE_ENV === 'test' ? () => {} : req.logger?.error || console.error
+    const error = process.env.NODE_ENV === 'test' ? () => {} : req.logger?.error || console.error // eslint-disable-line no-unused-vars
+    const warn = process.env.NODE_ENV === 'test' ? () => {} : req.logger?.warn || console.error
 
     if (req.originalUrl.startsWith('/api')) {
       const matchResult = matchRequestToOpenApiPath(req, pathsMap)
       if (!matchResult) {
-        error(`Path ${req.originalUrl} not found in API spec`)
-        return res.status(404).json({ message: `Path ${req.originalUrl} not found in API spec` })
+        const message = `Path '${req.originalUrl}' not found in API spec`
+        warn(message)
+        return res.status(404).json({ message })
       }
-      console.log(matchResult)
+
+      const { path: openApiPath } = matchResult
+      const pathSpec = apiSpec.paths[openApiPath]
+      const methodSpec = pathSpec[req.method.toLowerCase()]
+      if (!methodSpec) {
+        const message = `Method ${req.method.toUpperCase()} not allowed on path '${req.originalUrl}'`
+        warn(message)
+        return res.status(405).json({ message })
+      }
     }
 
     next()
     /*
-
-    const { path: expressPath, params } = matchResult
-    const pathSpec = apiSpec.paths[expressPath]
-    const methodSpec = pathSpec[req.method.toLowerCase()]
-    if (!methodSpec) {
-      return res.status(405).json({ error: `Method ${req.method} not allowed on path ${req.originalUrl}` })
-    }
-
     // Validate path parameters, query parameters, and request body
     try {
       validateParameters(req, params, methodSpec, ajv)

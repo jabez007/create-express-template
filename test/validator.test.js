@@ -41,11 +41,11 @@ describe('validator Middleware', () => {
             .expect(404)
             .end((err, res) => {
                 if (err) return done(err);
-                assert.strictEqual(res.body.message, 'Path /api/unknown/123 not found in API spec');
+                assert.strictEqual(res.body.message, `Path '/api/unknown/123' not found in API spec`);
                 done();
             });
     });
-    /*
+
     it('should return 405 for method not allowed', (done) => {
         request(app)
             .post('/api/users/123')
@@ -53,11 +53,11 @@ describe('validator Middleware', () => {
             .expect(405)
             .end((err, res) => {
                 if (err) return done(err);
-                assert.strictEqual(res.body.error, 'Method POST not allowed on path /api/users/123');
+                assert.strictEqual(res.body.message, `Method POST not allowed on path '/api/users/123'`);
                 done();
             });
     });
-
+    /*
     it('should return 400 for invalid numeric userId', (done) => {
         request(app)
             .get('/api/users/1234')
