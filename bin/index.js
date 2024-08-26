@@ -88,6 +88,9 @@ async function main () {
   console.log('installing ExpressJS (this may take a while)')
   await exec('npm install express')
 
+  console.log('installing uuid (this may take a while)')
+  await exec('npm install uuid')
+
   console.log('installing Morgan (this may take a while)')
   await exec('npm install morgan')
 
