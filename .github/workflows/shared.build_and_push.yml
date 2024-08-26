@@ -24,6 +24,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: See which repo we just cloned
+        if: ${{ vars.PIPELINE_DEBUG == 'true' }}
+        run: ls -lha
+
       - name: Get short commit hash
         id: git_commit
         run: echo "short_hash=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
@@ -35,9 +39,9 @@ jobs:
           name: ${{ inputs.artifact-name }}
           path: ${{ inputs.artifact-path }}
 
-      - name: See which repo we just cloned
-        if: ${{ vars.PIPELINE_DEBUG == 'true' }}
-        run: ls -lha
+      - name: See which artifacts we just downloaded
+        if: ${{ inputs.artifact-name != '' && vars.PIPELINE_DEBUG == 'true' }}
+        run: ls ${{ inputs.artifact-path }} -lha
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
