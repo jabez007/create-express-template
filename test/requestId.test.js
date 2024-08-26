@@ -12,23 +12,48 @@ describe('requestId Middleware', () => {
         mockResponse = createResponse()
     })
 
-    it('injects id into Request object', () => {
+    it('injects only traceId into Request object', () => {
         requestId()(mockRequest, mockResponse, nextFunction)
-        assert.notEqual(mockRequest.id, undefined)
+        assert.notEqual(mockRequest.traceId, undefined)
+        assert.equal(mockRequest.spanId, undefined)
     })
 
-    it('uses the value from the existing Request header', () => {
+    it('uses the value from the existing traceId Request header', () => {
         mockRequest = createRequest({
             headers: {
                 'X-Request-Id': 'foobar'
             }
         })
         requestId()(mockRequest, mockResponse, nextFunction)
-        assert.equal(mockRequest.id, 'foobar')
+        assert.equal(mockRequest.traceId, 'foobar')
+        assert.equal(mockRequest.spanId, undefined)
     })
 
-    it('includes the id in the Response headers', () => {
+    it('uses the value from the existing spanId Request header', () => {
+        mockRequest = createRequest({
+            headers: {
+                'X-svc2svc-Id': 'foobar'
+            }
+        })
+        requestId()(mockRequest, mockResponse, nextFunction)
+        assert.notEqual(mockRequest.traceId, undefined)
+        assert.equal(mockRequest.spanId, 'foobar')
+    })
+
+    it('includes only the traceId in the Response headers', () => {
         requestId()(mockRequest, mockResponse, nextFunction)
         assert.notEqual(mockResponse.get('X-Request-Id'), undefined)
+        assert.equal(mockResponse.get('X-svc2svc-Id'), undefined)
+    })
+
+    it('includes the spanId in the Response headers', () => {
+        mockRequest = createRequest({
+            headers: {
+                'X-svc2svc-Id': 'foobar'
+            }
+        })
+        requestId()(mockRequest, mockResponse, nextFunction)
+        assert.notEqual(mockResponse.get('X-Request-Id'), undefined)
+        assert.equal(mockResponse.get('X-svc2svc-Id'), 'foobar')
     })
 })
