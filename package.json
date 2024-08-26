@@ -44,10 +44,10 @@
     "supertest": "^7.0.0"
   },
   "dependencies": {
-    "~connections": "file:./src/connections",
     "~databases": "file:./src/connections/databases",
     "~models": "file:./src/models",
     "~routes": "file:./src/routes",
+    "~services": "file:./src/connections/services",
     "~utils": "file:./src/utils",
     "axios": "^1.7.3",
     "dotenv": "^16.4.5",
