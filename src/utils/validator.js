@@ -54,6 +54,21 @@ const matchRequestToOpenApiPath = (req, pathsMap) => {
   return null
 }
 
+// Merge parameters from path and method levels
+// Method parameters override path parameters,
+// but cannot remove path parameters
+const mergeParameters = (pathParams = [], methodParams = []) => {
+  const mapParamArrayToObject = (acc, param) => {
+    acc[`${param.in}:${param.name}`] = param
+    return acc
+  }
+
+  return Object.values({
+    ...pathParams.reduce(mapParamArrayToObject, {}),
+    ...methodParams.reduce(mapParamArrayToObject, {})
+  })
+}
+
 module.exports = function createValidationMiddleware (_apiSpec) {
   // const ajv = new Ajv({ allErrors: true, coerceTypes: true })
   // ajvFormats(ajv)
@@ -93,6 +108,9 @@ module.exports = function createValidationMiddleware (_apiSpec) {
         warn(message)
         return res.status(405).json({ message })
       }
+
+      const openApiParams = mergeParameters(pathSpec.parameters, methodSpec.parameters)
+      console.log(openApiParams)
     }
 
     next()

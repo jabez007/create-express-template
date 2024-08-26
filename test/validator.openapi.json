@@ -15,10 +15,15 @@
         }
       },
       "/api/users/{userId}": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
         "get": {
           "parameters": [
             {
-              "$ref": "#/components/parameters/userId"
+              "$ref": "#/components/parameters/strictUserId"
             }
           ],
           "responses": {
@@ -38,6 +43,17 @@
           "schema": {
             "type": "number",
             "format": "int32"
+          }
+        },
+        "strictUserId": {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "int32",
+            "minimum": 0,
+            "maximum": 100
           }
         }
       }
