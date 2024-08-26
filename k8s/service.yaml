@@ -10,4 +10,4 @@ spec:
     # must match ALL the labels set on the pod
     app: create-express-template
   ports:
-  - port: 8080 # exposed internally to the cluster
+    - port: 8080 # exposed internally to the cluster
