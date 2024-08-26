@@ -1,0 +1,38 @@
+name: Dry Run Kubernetes Apply
+
+on:
+  workflow_call:
+    
+jobs:
+  dry-run-k8s:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+    
+      - name: Update deployment manifest
+        if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
+        run: sed -i 's|<git-hash>|${{ github.sha }}|g' k8s/deployment.yaml
+      
+      - name: Show deployment manifest after update
+        if: ${{ hashFiles('k8s/deployment.yaml') != '' && vars.PIPELINE_DEBUG == 'true' }}
+        run: cat k8s/deployment.yaml
+
+      - name: Set up kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+      
+      - name: Generate configmap
+        if: ${{ hashFiles('.env') != '' }}
+        run: kubectl create configmap ${{ github.event.repository.name }}-config --from-env-file .env -o yaml --dry-run=client
+
+      - name: Dry run deployment
+        if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
+        run: kubectl apply -f k8s/deployment.yaml --dry-run=client
+
+      - name: Dry run service
+        if: ${{ hashFiles('k8s/service.yaml') != '' }}
+        run: kubectl apply -f k8s/service.yaml --dry-run=client
