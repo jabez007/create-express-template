@@ -11,4 +11,6 @@ jobs:
       contents: read
       packages: write
     uses: jabez007/create-express-template/.github/workflows/shared.dry_run_k8s.yml@master
+    with:
+      env_files: .env , .env.development
     secrets: inherit
