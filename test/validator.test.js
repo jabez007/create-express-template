@@ -15,13 +15,35 @@ describe('validator Middleware', () => {
         app.use(createValidationMiddleware(apiSpec));
 
         app.get('/api/users', (req, res) => {
-            res.status(200).json({ found: [] });
+            res.status(200).json({ found: req.query.name });
         });
         
         app.get('/api/users/:userId([0-9]{1,3})', (req, res) => {
             res.status(200).json({ userId: req.params.userId });
         });
 
+    });
+
+    it('should match and validate query parameter successfully', (done) => {
+        request(app)
+            .get('/api/users?name=Luke')
+            .expect(200)
+            .end((err, res) => {
+                if (err) return done(err);
+                assert.strictEqual(res.body.found, 'Luke');
+                done();
+            });
+    });
+
+    it('should match but find invalid query parameter', (done) => {
+        request(app)
+            .get('/api/users?name=1234')
+            .expect(400)
+            .end((err, res) => {
+                if (err) return done(err);
+                assert.strictEqual(res.body.message, 'Invalid query parameter: name');
+                done();
+            });
     });
 
     it('should match and validate numeric userId successfully', (done) => {
@@ -68,7 +90,7 @@ describe('validator Middleware', () => {
                 done();
             });
     });
-    /*
+    
     it('should return 400 for invalid numeric userId', (done) => {
         request(app)
             .get('/api/users/1234')
@@ -78,5 +100,5 @@ describe('validator Middleware', () => {
                 done();
             });
     });
-    */
+    
 });

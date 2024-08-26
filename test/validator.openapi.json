@@ -7,6 +7,16 @@
     "paths": {
       "/api/users": {
         "get": {
+          "parameters": [
+            {
+              "in": "query",
+              "name": "name",
+              "schema": {
+                "type": "string",
+                "pattern": "^[A-Za-z]*$"
+              }
+            }
+          ],
           "responses": {
             "200": {
               "description": "Found Users"

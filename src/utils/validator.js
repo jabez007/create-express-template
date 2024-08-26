@@ -83,6 +83,20 @@ const validatePathParameters = (params, specParameters, ajv) => {
     })
 }
 
+const validateQueryParameters = (query, specParameters, ajv) => {
+  specParameters
+    .filter((param) => param.in === 'query')
+    .forEach((param) => {
+      const schema = param.schema || param
+      const value = query[param.name]
+
+      const valid = ajv.validate(schema, value)
+      if (!valid) {
+        throw new Error(`Invalid ${param.in} parameter: ${param.name}`)
+      }
+    })
+}
+
 module.exports = function createValidationMiddleware (_apiSpec) {
   const ajv = new Ajv({ allErrors: true, coerceTypes: true })
   ajvFormats(ajv)
@@ -126,6 +140,7 @@ module.exports = function createValidationMiddleware (_apiSpec) {
       const openApiParams = mergeParameters(pathSpec.parameters, methodSpec.parameters)
       try {
         validatePathParameters(params, openApiParams, ajv)
+        validateQueryParameters(req.query, openApiParams, ajv)
       } catch (validationError) {
         warn(validationError.message, { details: validationError.errors })
         res.status(400).json({ message: validationError.message, details: validationError.errors })
