@@ -121,6 +121,7 @@ async function main () {
    */
   console.log('installing swagger-jsdoc (this may take a while)')
   await exec('npm install swagger-jsdoc')
+  /* #### END #### */
 
   /*
    * install Mocha
@@ -141,6 +142,32 @@ async function main () {
   /* #### END #### */
 
   /*
+   * Docker
+  */
+  const usingDocker = !!(
+    await askQuestion('Are you using Docker (Y/n)? ', 'y', (a) => a.trim().match(/^(y|n|yes|no)$/i) ? true : 'Please enter y or n')
+  ).trim().match(/^(y|yes)$/i)
+  if (usingDocker) {
+    const dockerUser = await askQuestion('What is your Docker Hub username? ')
+
+    console.log('copying dockerignore')
+    await cp(join(__dirname, '..', '.dockerignore'), join(projectWorkingDirectory, '.dockerignore'))
+
+    console.log('copying Dockerfile')
+    await cp(join(__dirname, '..', 'Dockerfile'), join(projectWorkingDirectory, 'Dockerfile'))
+
+    console.log('adding start:docker to scripts in package.json')
+    await exec('npm pkg set scripts.start:docker="node ."')
+
+    console.log('adding build:docker to scripts in package.json')
+    await exec(`npm pkg set scripts.build:docker="docker build -t ${dockerUser}/${folderName}"`)
+
+    console.log('adding prebuild:docker to scripts in package.json')
+    await exec('npm pkg set scripts.prebuild:docker="npm run lint"')
+  }
+  /* #### END #### */
+
+  /*
    * initialize and configure git
    * ALWAYS goes last
    */
@@ -149,6 +176,7 @@ async function main () {
   ).trim().match(/^(y|yes)$/i)
   if (usingGit) {
     const gitUrl = await askQuestion('What is the URL for your Git repo? ')
+
     console.log('setting package repository')
     await exec('npm pkg set repository.type=git')
     await exec(`npm pkg set repository.url=git+${gitUrl}`)

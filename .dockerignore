@@ -1,0 +1,16 @@
+**/node_modules/
+**/dist
+.git
+npm-debug.log
+.coverage
+.coverage.*
+.aws
+
+**/bin
+**/logs
+**/test
+.dockerignore
+.eslint*
+.gitignore
+Dockerfile
+README.md

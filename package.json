@@ -5,9 +5,12 @@
   "bin": "./bin/index.js",
   "main": "./src/index.js",
   "scripts": {
+    "prebuild:docker": "npm run lint",
+    "build:docker": "docker build -t jabez07/create-express-template",
     "lint": "eslint --fix ./src/**/*.{js,jsx,ts}",
     "prestart": "npm run lint",
     "start": "node .",
+    "start:docker": "node .",
     "test": "mocha"
   },
   "repository": {
