@@ -8,12 +8,12 @@ module.exports = require('~utils/MITchyM')({
         res.json({
           found: [
             {
-                first: "John",
-                last: "Doe"
+              first: 'John',
+              last: 'Doe'
             },
             {
-                first: "Jane",
-                last: "Doe"
+              first: 'Jane',
+              last: 'Doe'
             }
           ]
         })
@@ -24,8 +24,8 @@ module.exports = require('~utils/MITchyM')({
       path: '/:id',
       callbacks: (req, res) => {
         res.json({
-            first: "John",
-            last: "Doe"
+          first: 'John',
+          last: 'Doe'
         })
       }
     }

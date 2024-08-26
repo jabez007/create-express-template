@@ -1,3 +1,14 @@
 {
-  "extends": "standard"
+  "extends": [
+    "eslint:recommended",
+    "standard"
+  ],
+  "overrides": [
+    {
+      "files": "./test/**/*.{test,spec}.js",
+      "rules": {
+        "no-undef": "off"
+      }
+    }
+  ]
 }
