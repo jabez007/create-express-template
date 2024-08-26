@@ -26,7 +26,7 @@ jobs:
       - name: Test Docker Container
         run: |
           sleep 10
-          if curl --fail http://localhost/ping; then
+          if curl --fail http://localhost:8080/ping; then
             echo "Server started and ping endpoint is working"
           else
             echo "Ping endpoint test failed"
