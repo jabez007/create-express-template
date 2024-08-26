@@ -28,11 +28,14 @@ module.exports = {
     let query = req.query.name ? ('?search=' + req.query.name) : ''
     const users = []
     while (query !== undefined) {
-      const res = (await swapiClient(req).get(`/people${query}`)).data
-      users.push(...res.results)
-      query = res.next?.split('?').splice(-1)[0]
-      if (query) query = `?${query}`
-      console.log(query)
+      try {
+        const res = (await swapiClient(req).get(`/people${query}`)).data
+        users.push(...res.results)
+        query = res.next?.split('?').splice(-1)[0]
+        if (query) query = `?${query}`
+      } catch {
+        query = undefined
+      }
     }
 
     return users
@@ -42,6 +45,7 @@ module.exports = {
     if (process.env.NODE_ENV === 'test') {
       return mockUser
     }
+
     return (await swapiClient(req).get(`/people/${req.params.userId}`)).data
   }
 }
