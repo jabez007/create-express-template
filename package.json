@@ -8,6 +8,7 @@
     "prebuild:docker": "npm run lint",
     "build:docker": "docker build --platform=linux/amd64 -t jabez07/create-express-template:$npm_package_version",
     "lint": "eslint --fix ./src/**/*.{js,jsx,ts}",
+    "serve": "nodemon --watch src -e js,jsx --exec npm run start",
     "serve:docker": "docker run --init --name create-express-template -p 80:8080 --env-file ./.env -d jabez07/create-express-template:$npm_package_version",
     "prestart": "npm run lint",
     "start": "node .",
@@ -38,7 +39,8 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.4.0",
     "mocha": "^10.6.0",
-    "node-mocks-http": "^1.15.0"
+    "node-mocks-http": "^1.15.0",
+    "nodemon": "^3.1.4"
   },
   "dependencies": {
     "~routes": "file:./src/routes",
