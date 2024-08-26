@@ -35,6 +35,10 @@ jobs:
           name: ${{ inputs.artifact-name }}
           path: ${{ inputs.artifact-path }}
 
+      - name: See which repo we just cloned
+        if: ${{ vars.PIPELINE_DEBUG == 'true' }}
+        run: ls -lha
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
