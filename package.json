@@ -11,7 +11,7 @@
     "serve": "nodemon --watch src -e js,jsx --exec npm run start",
     "serve:docker": "docker run --init --name create-express-template -p 80:8080 --env-file ./.env -d jabez07/create-express-template:$npm_package_version",
     "prestart": "npm run lint",
-    "start": "node .",
+    "start": "node -r dotenv/config .",
     "start:docker": "node .",
     "test": "NODE_ENV=test mocha"
   },
@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/jabez007/create-express-template#readme",
   "devDependencies": {
+    "dotenv": "^16.4.5",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
@@ -50,7 +51,6 @@
     "~services": "file:./src/connections/services",
     "~utils": "file:./src/utils",
     "axios": "^1.7.3",
-    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "morgan": "^1.10.0",
     "short-unique-id": "^5.2.0",
