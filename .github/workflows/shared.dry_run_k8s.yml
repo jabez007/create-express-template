@@ -18,7 +18,7 @@ jobs:
       - name: Generate configmap without secrets
         uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/configmap@development
         with:
-          env_files: .env.common , .env.development
+          env_files: ${{ inputs.env_files }}
           debug: ${{ vars.pipeline_debug }}
 
       - uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/deployment@development
