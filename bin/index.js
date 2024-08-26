@@ -53,6 +53,12 @@ async function main () {
   console.log('updating main in package.json')
   await exec('npm pkg set main=./src/index.js')
 
+  console.log('adding start to scripts in package.json')
+  await exec('npm pkg set scripts.start="node ."')
+
+  console.log('adding alias for routes')
+  await exec('npm pkg set dependencies.~routes=file:./src/routes')
+
   console.log('adding alias for utils')
   await exec('npm pkg set dependencies.~utils=file:./src/utils')
   /* #### END #### */
@@ -75,6 +81,9 @@ async function main () {
 
   console.log('adding lint to scripts in package.json')
   await exec('npm pkg set scripts.lint="eslint --fix ./src/**/*.{js,jsx,ts}"')
+
+  console.log('adding prestart to scripts in package.json')
+  await exec('npm pkg set scripts.prestart="npm run lint"')
   /* #### END #### */
 
   /*
