@@ -102,8 +102,8 @@ async function main () {
   console.log('writing .env file')
   await writeFile(join(projectWorkingDirectory, '.env'), 'PORT=8080')
 
-  console.log('copying .env.development file')
-  await cp(join(__dirname, '..', 'env.development'), join(projectWorkingDirectory, '.env.development'))
+  console.log('copying development .env file')
+  await cp(join(__dirname, '..', '.env.development'), join(projectWorkingDirectory, '.env.development'))
   /* #### END #### */
 
   /*
