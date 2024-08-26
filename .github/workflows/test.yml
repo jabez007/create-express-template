@@ -11,5 +11,5 @@ on:
 
 jobs:
   run_tests:
-    uses: jabez007/create-express-template/.github/workflows/shared/test.yml
+    uses: jabez007/create-express-template/.github/workflows/shared/test.yml@master
     secrets: inherit
