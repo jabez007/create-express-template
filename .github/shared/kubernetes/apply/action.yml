@@ -1,0 +1,59 @@
+name: Apply Kubernetes Manifests to Cluster
+description: ''
+
+inputs:
+  dry_run:
+    description: ''
+    default: 'true'
+  debug:
+    description: Whether or not to display debug output
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Test kubectl access
+      if: ${{ inputs.debug == 'true' }}
+      run: kubectl get pods
+      shell: bash
+
+    ####
+
+    - name: Apply configmap
+      if: ${{ hashFiles('k8s/configmap.yaml') != '' }}
+      run: kubectl apply -f k8s/configmap.yaml ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
+      shell: bash
+
+    - name: Describe configmap
+      if: ${{ hashFiles('k8s/configmap.yaml') != '' && inputs.dry_run != 'true' && inputs.debug == 'true' }}
+      run: kubectl describe cm $(yq -r .metadata.name k8s/configmap.yaml)
+      shell: bash
+
+    ####
+
+    - name: Apply deployment
+      if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
+      run: kubectl apply -f k8s/deployment.yaml ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
+      shell: bash
+
+    - name: Describe deployment
+      if: ${{ hashFiles('k8s/deployment.yaml') != '' && inputs.dry_run != 'true' && inputs.debug == 'true' }}
+      run: kubectl describe deploy $(yq -r .metadata.name k8s/deployment.yaml)
+      shell: bash
+
+    - name: Check deployment rollout status
+      if: ${{ hashFiles('k8s/deployment.yaml') != '' && inputs.dry_run != 'true' }}
+      run: kubectl rollout status deploy $(yq -r .metadata.name k8s/deployment.yaml)
+      shell: bash
+
+    ####
+
+    - name: Apply service
+      if: ${{ hashFiles('k8s/service.yaml') != '' }}
+      run: kubectl apply -f k8s/service.yaml ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
+      shell: bash
+
+    - name: Describe service
+      if: ${{ hashFiles('k8s/service.yaml') != '' && inputs.dry_run != 'true' && inputs.debug == 'true' }}
+      run: kubectl describe svc $(yq -r .metadata.name k8s/service.yaml)
+      shell: bash

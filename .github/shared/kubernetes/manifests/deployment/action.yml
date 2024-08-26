@@ -1,0 +1,25 @@
+name: Update Kubernetes deployment manifest
+description: Replaces placeholders in k8s/deployment.yaml files
+
+inputs:
+  container_registry:
+    description: ''
+    default: 'ghcr.io'
+  image_tag:
+    description: ''
+  debug:
+    description: Whether or not to display debug output
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Update deploy manifest
+      if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
+      run: sed -i 's|CONTAINER_IMAGE|${{ inputs.container_registry }}/${{ github.repository }}:${{ inputs.image_tag }}|g' k8s/deployment.yaml
+      shell: bash
+
+    - name: Cat deploy manifest after update
+      if: ${{ hashFiles('k8s/deployment.yaml') != '' && inputs.debug == 'true' }}
+      run: cat k8s/deployment.yaml
+      shell: bash

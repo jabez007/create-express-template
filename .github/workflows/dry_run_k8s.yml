@@ -1,4 +1,4 @@
-name: Run Shared Dry Run Workflow
+name: Run Composite Dry Run Actions
 
 on:
   push:
@@ -13,9 +13,32 @@ on:
 
 jobs:
   dry_run_k8s:
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-    uses: jabez007/create-express-template/.github/workflows/shared.dry_run_k8s.yml@master
-    with:
-      env_files: .env , .env.development
-    secrets: inherit
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Generate configmap without secrets
+        uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/configmap@development
+        with:
+          env_files: .env , .env.common , .env.development
+          debug: ${{ vars.pipeline_debug }}
+
+      - uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/deployment@development
+        with:
+          image_tag: latest
+          debug: ${{ vars.pipeline_debug }}
+    
+      - name: Install minikube
+        run: |
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+      
+      - name: Start minikube
+        run: minikube start
+
+      - uses: jabez007/create-express-template/.github/shared/kubernetes/apply@development
+        with:
+          debug: ${{ vars.pipeline_debug }}
