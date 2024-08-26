@@ -9,18 +9,31 @@ module.exports = require('~utils/MITchyM')({
        * /api/users:
        *   get:
        *     description: Search for specified User records
+       *     parameters:
+       *       - in: query
+       *         name: name
+       *         schema:
+       *           type: string
+       *         example: Skywalker
        *     responses:
        *       200:
        *         description: Returns JSON object for the found User records
        */
       name: ' GET ',
       path: '/',
-      callbacks: (req, res) => {
-        req.logger.debug(`User Search Params: ${JSON.stringify(req.query, null, 2)}`)
+      callbacks: async (req, res) => {
+        req.logger.debug('User search query', { query: req.query })
 
-        res.json({
-          found: []
-        })
+        try {
+          res.json({
+            found: await User.search(req)
+          })
+        } catch (err) {
+          req.logger.error(err)
+          res
+            .status(err.response?.status || 500)
+            .json(err.response?.data || err)
+        }
       }
     },
     {
@@ -70,4 +83,5 @@ module.exports = require('~utils/MITchyM')({
  *       schema:
  *         type: integer
  *         format: int32
+ *       example: 13
  */

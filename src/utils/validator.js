@@ -158,8 +158,8 @@ module.exports = function createValidationMiddleware (_apiSpec) {
 
   // Middleware function to validate requests
   return (req, res, next) => {
-    const error = process.env.NODE_ENV === 'test' ? () => {} : req.logger?.error || console.error // eslint-disable-line no-unused-vars
     const warn = process.env.NODE_ENV === 'test' ? () => {} : req.logger?.warn || console.error
+    const debug = process.env.NODE_ENV === 'test' ? () => {} : req.logger?.debug || console.log
 
     if (req.originalUrl.startsWith('/api')) {
       const matchResult = matchRequestToOpenApiPath(req, pathsMap)
@@ -180,6 +180,7 @@ module.exports = function createValidationMiddleware (_apiSpec) {
 
       const openApiParams = methodsMap[`${req.method.toLowerCase()}:${openApiPath}`] // mergeParameters(pathSpec.parameters, methodSpec.parameters)
       try {
+        debug('Attempting to validate parameters', { params, query: req.query, headers: req.headers })
         validateParameters(openApiParams, params, req.query, req.header, {}, ajv)
         //
         validateRequestBody(methodSpec, req, ajv)

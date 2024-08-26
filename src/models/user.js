@@ -63,6 +63,10 @@ module.exports = class User {
     this.edited = new Date(edited)
   }
 
+  static async search (req) {
+    return (await userClient.searchUsers(req)).map((res) => new User(res))
+  }
+
   static async get (req) {
     return new User(await userClient.getUser(req))
   }
