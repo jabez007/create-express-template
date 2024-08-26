@@ -13,3 +13,7 @@ jobs:
   run_tests:
     uses: jabez007/create-node-template/.github/workflows/shared.test.yml@master
     secrets: inherit
+
+  test_docker:
+    uses: jabez007/create-express-template/.github/workflows/shared.build_and_test.yml@master
+    secrets: inherit
