@@ -272,8 +272,7 @@ async function main () {
     await exec(`git remote add origin ${gitUrl}`)
 
     console.log('adding version to scripts in package.json')
-    // eslint-disable-next-line no-useless-escape
-    await exec('npm pkg set scripts.version:short="echo \'{ \"short\": \"\'\$(git rev-parse --short HEAD)\'\" }\' > src/version.log"')
+    await exec('npm pkg set scripts.version:short="echo \'{ \\"short\\": \\"\'\\$(git rev-parse --short HEAD)\'\\" }\' > src/version.log"')
 
     console.log('adding prelint to scripts in package.json')
     await exec('npm pkg set scripts.prelint="npm run version:short"')
