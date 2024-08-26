@@ -8,6 +8,16 @@ const convertOpenApiPathToExpress = (path) => {
   return path.replace(/{(.*?)}/g, ':$1')
 }
 
+// Preprocess the OpenAPI paths: convert to Express notation and create regex
+const preprocessPaths = (paths, pathsMap) => {
+  Object.keys(paths).forEach((openApiPath) => {
+    const expressPath = convertOpenApiPathToExpress(openApiPath)
+    const regexp = pathToRegexp(expressPath)
+    const keys = regexp.keys
+    pathsMap.push({ regexp, keys, openApiPath })
+  })
+}
+
 // Extract path parameters from the match result
 const extractParamsFromPath = (matchResult, keys) => {
   const values = matchResult.slice(1)
@@ -21,15 +31,13 @@ const extractParamsFromPath = (matchResult, keys) => {
 }
 
 // Match the OpenAPI path to the actual Express route using path-to-regexp
-const matchRequestToOpenApiPath = (req, paths) => {
+const matchRequestToOpenApiPath = (req, pathsMap) => {
   const debug = process.env.NODE_ENV === 'test' ? () => {} : req.logger?.debug || console.log
 
   const incomingPath = req.originalUrl.split('?')[0] // Strip query string for matching
   debug(`Attempting to validate '${incomingPath}'`)
-  for (const openApiPath of Object.keys(paths)) {
-    const expressPath = convertOpenApiPathToExpress(openApiPath)
-    const regexp = pathToRegexp(expressPath)
-    const keys = regexp.keys
+
+  for (const { regexp, keys, openApiPath } of pathsMap) {
     const matchResult = regexp.exec(incomingPath)
 
     if (matchResult) {
@@ -50,6 +58,8 @@ module.exports = function createValidationMiddleware (_apiSpec) {
   // const ajv = new Ajv({ allErrors: true, coerceTypes: true })
   // ajvFormats(ajv)
 
+  const pathsMap = []
+
   // Validate the spec itself
   let apiSpec
   swaggerParser.validate(_apiSpec, (err, api) => {
@@ -57,6 +67,9 @@ module.exports = function createValidationMiddleware (_apiSpec) {
       throw new Error(`Invalid OpenAPI/Swagger spec: ${err.message}`)
     }
     apiSpec = api // dereferenced OpenAPI definitions - i.e. All $refs have been resolved
+
+    // Preprocess paths: convert to Express notation and generate regex
+    preprocessPaths(apiSpec.paths, pathsMap)
   })
 
   // Middleware function to validate requests
@@ -64,7 +77,7 @@ module.exports = function createValidationMiddleware (_apiSpec) {
     const error = process.env.NODE_ENV === 'test' ? () => {} : req.logger?.error || console.error
 
     if (req.originalUrl.startsWith('/api')) {
-      const matchResult = matchRequestToOpenApiPath(req, apiSpec.paths)
+      const matchResult = matchRequestToOpenApiPath(req, pathsMap)
       if (!matchResult) {
         error(`Path ${req.originalUrl} not found in API spec`)
         return res.status(404).json({ message: `Path ${req.originalUrl} not found in API spec` })
