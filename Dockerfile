@@ -42,8 +42,9 @@ COPY --chown=node:node package*.json ./
 USER node
 
 # Install applicaion dependencies
+# using a npmrc (if passed in) configured to download any private packages
 # omitting any devDependencies 
-RUN npm install --omit=dev
+RUN --mount=type=secret,id=npmrc,target=/home/node/.npmrc,uid=1000 npm install --omit=dev
 
 # copy your application code 
 # with the appropriate permissions 

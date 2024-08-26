@@ -1,1 +1,1 @@
-module.exports = require('~utils/MITchyM')({ dirname: __dirname })
+module.exports = require('@utils/MITchyM')({ dirname: __dirname })

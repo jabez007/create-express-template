@@ -2,8 +2,9 @@ name: Run Shared Test Workflow
 
 on:
   push:
-    branches:
-      - development
+    branches-ignore:
+      - main
+      - master
   pull_request:
     branches:
       - main
@@ -11,5 +12,9 @@ on:
 
 jobs:
   run_tests:
-    uses: jabez007/create-express-template/.github/workflows/shared.test.yml@master
+    uses: jabez007/create-node-template/.github/workflows/shared.test.yml@master
+    secrets: inherit
+
+  test_docker:
+    uses: jabez007/create-express-template/.github/workflows/shared.build_and_test.yml@master
     secrets: inherit

@@ -39,36 +39,63 @@ module.exports = function svcAgent ({
       }
     })
 
-    client.interceptors.request.use((req) => {
-      const spanId = generator(expressRequest)
-      info(`sending request ${spanId}`, { childSpanId: spanId })
-      req.headers.set(spanIdHeader, spanId)
-      debug('sending request', { axios: req })
-      return req
-    }, (err) => {
-      error(err)
-      return Promise.reject(err)
-    })
-
-    client.interceptors.response.use((res) => {
-      debug('received response', {
-        axios: {
-          request: res.config,
-          status: res.status,
-          statusText: res.statusText,
-          headers: res.headers,
-          data: res.data
+    client.interceptors.request.use(
+      (req) => {
+        const spanId = generator(expressRequest)
+        info(`sending request ${spanId}`, { childSpanId: spanId })
+        req.headers.set(spanIdHeader, spanId)
+        debug('sending request', { axios: req })
+        return req
+      },
+      (err) => {
+        let axios = {
+          request: err.config
         }
-      })
-      const spanId = res.headers[spanIdHeader] || res.config.headers[spanIdHeader]
-      if (spanId) {
-        info(`received response ${spanId}`, { childSpanId: spanId })
+        if (err.request) {
+          axios = {
+            ...axios
+            // TODO: add information from the http.ClientRequest object?
+          }
+        }
+        error(err.message, { axios })
+        return Promise.reject(err)
       }
-      return res
-    }, (err) => {
-      error(err)
-      return Promise.reject(err)
-    })
+    )
+
+    client.interceptors.response.use(
+      (res) => {
+        debug('received response', {
+          axios: {
+            request: res.config,
+            status: res.status,
+            statusText: res.statusText,
+            headers: res.headers,
+            data: res.data
+          }
+        })
+        const spanId = res.headers[spanIdHeader] || res.config.headers[spanIdHeader]
+        if (spanId) {
+          info(`received response ${spanId}`, { childSpanId: spanId })
+        }
+        return res
+      },
+      (err) => {
+        let axios = {
+          request: err.config
+        }
+        if (err.response) {
+          axios = {
+            ...axios,
+            status: err.response.status,
+            statusText: err.response.statusText,
+            headers: err.response.headers,
+            data: err.response.data
+          }
+        }
+        error(err.message, { axios })
+        return Promise.reject(err)
+      }
+    )
 
     return client
   }

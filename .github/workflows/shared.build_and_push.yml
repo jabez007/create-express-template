@@ -3,6 +3,12 @@ name: Build and Push Docker Image to GHCR
 on:
   workflow_call:
     inputs:
+      artifact-name:
+        required: false
+        type: string
+      artifact-path:
+        type: string
+        default: .
       platforms:
         type: string
         default: linux/amd64,linux/arm64
@@ -17,6 +23,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Get short commit hash
+        id: git_commit
+        run: echo "short_hash=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Download artifacts
+        if: ${{ inputs.artifact-name != '' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.artifact-path }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -33,14 +50,31 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }} # automatically provided by GitHub Actions, so you don't need to create it manually.
 
       - name: Build and push Docker image
+        if: ${{ inputs.push }}
         uses: docker/build-push-action@v4
         with:
           platforms: ${{ inputs.platforms }}
           context: .
-          push: ${{ inputs.push }}
+          push: true
           # GITHUB_REPOSITORY = The owner and repository name. For example, octocat/Hello-World.
           # ghcr.io prefix makes sure we are pushing to GHCR
-          tags: ghcr.io/${{ github.repository }}:latest , ghcr.io/${{ github.repository }}:${{ github.sha }} # octocat/Hello-World:ffac537e6cbbf934b08745a378932722df287a53
+          tags: ghcr.io/${{ github.repository }}:latest , ghcr.io/${{ github.repository }}:${{ steps.git_commit.outputs.short_hash }} # octocat/Hello-World:ffac537
+
+      - name: Build and export Docker image
+        if: ${{ ! inputs.push }}
+        uses: docker/build-push-action@v4
+        with:
+          platforms: ${{ inputs.platforms }}
+          context: .
+          tags: ${{ github.repository }}:${{ steps.git_commit.outputs.short_hash }}
+          outputs: type=docker,dest=/tmp/${{ github.repository }}.tar
+
+      - name: Upload image artifacts
+        if: ${{ ! inputs.push }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.git_commit.outputs.short_hash }}
+          path: /tmp/${{ github.repository }}.tar
 
       - name: Post cleanup
         run: docker image prune -f

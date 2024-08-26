@@ -1,6 +1,6 @@
 const axios = require('axios')
 const assert = require('assert')
-const svcAgent = require('~utils/axios')
+const svcAgent = require('@utils/axios')
 
 describe('svcAgent Constructor', () => {
   let req

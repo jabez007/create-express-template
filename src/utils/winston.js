@@ -58,10 +58,8 @@ const format = () => {
     // Add the message timestamp with the preferred format
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
     // Define the JSON format for pretty print
-    (env === 'development' ? winston.format.json({ replacer: null, space: 2 }) : winston.format.json()),
+    (env === 'development' ? winston.format.json({ replacer: null, space: 2 }) : winston.format.json())
     // winston.format.prettyPrint(),
-    // Tell Winston that the logs must be colored
-    winston.format.colorize({ all: env === 'development' })
     /*
      * Define the format of the message showing the timestamp, the level and the message
     winston.format.printf(
@@ -73,17 +71,26 @@ const format = () => {
 
 // Define which transports the logger must use to print out messages.
 // In this example, we are using two different transports
-const defaultTransports = [
-  // Allow the use of the console to print all messages
-  new winston.transports.Console(),
-  // Allow error level messages to print to the error.log file
-  new winston.transports.File({
-    filename: 'logs/error.log',
-    level: 'error'
-  })
-]
+const defaultTransports = () => {
+  const env = process.env.NODE_ENV || 'development'
 
-module.exports = (transports = defaultTransports) => {
+  return [
+    // Allow the use of the console to print all messages
+    new winston.transports.Console({
+      format: winston.format.combine(
+        // Tell Winston that the logs must be colored
+        winston.format.colorize({ all: env === 'development' })
+      )
+    }),
+    // Allow error level messages to print to the error.log file
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      level: 'error'
+    })
+  ]
+}
+
+module.exports = (transports = defaultTransports()) => {
   const env = process.env.NODE_ENV || 'development'
 
   // Create the logger instance that has to be exported

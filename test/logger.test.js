@@ -1,8 +1,8 @@
 const assert = require('assert')
 const winston = require('winston')
 const { Writable } = require('stream')
-const Logger = require('~utils/winston')
-const loggerMiddleware = require('~utils/loggerMiddleware')
+const Logger = require('@utils/winston')
+const loggerMiddleware = require('@utils/loggerMiddleware')
 const { createRequest, createResponse } = require('node-mocks-http')
 
 describe('logger Constructor', () => {

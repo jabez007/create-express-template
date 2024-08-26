@@ -1,0 +1,44 @@
+name: Build and Push Docker Image to GHCR
+
+on:
+  workflow_call:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t test-image .
+
+      - name: Run Docker container
+        id: container_run
+        run: |
+          CONTAINER_ID=$(docker run -d -p 80:8888 test-image | tail -n 1)
+          echo "CONTAINER_ID=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Test Docker container
+        run: |
+          sleep 10
+          if curl --fail http://localhost/ping; then
+            echo "Server started and ping endpoint is working"
+          else
+            echo "Ping endpoint test failed"
+            exit 1
+          fi
+
+      - name: Stop and remove Docker container
+        if: always()
+        run: |
+          docker stop ${{ steps.container_run.outputs.CONTAINER_ID }}
+          docker rm ${{ steps.container_run.outputs.CONTAINER_ID }}
+
+      - name: Post cleanup
+        if: always()
+        run: docker image prune -f

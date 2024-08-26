@@ -1,5 +1,14 @@
-const express = require('express')
-const router = express.Router()
+const { join } = require('path')
+const router = require('express').Router()
+const { existsSync, readFileSync } = require('fs')
+const openapiSpecification = require('@utils/swagger')
+
+const VERSION_PATH = join(__dirname, '..', 'version.log')
+
+let assetVersion = process.env.npm_package_version
+if (existsSync(VERSION_PATH)) {
+  assetVersion = JSON.parse(readFileSync(VERSION_PATH)).short || process.env.npm_package_version
+}
 
 router.get('/', (req, res) => {
   req.logger.debug('Ping', { queryParams: req.query })
@@ -10,8 +19,8 @@ router.get('/', (req, res) => {
    */
   res.json({
     appName: process.env.npm_package_name,
-    appVersion: '', // API version?
-    assetVersion: process.env.npm_package_version,
+    appVersion: openapiSpecification.info?.version || process.env.npm_package_version,
+    assetVersion,
     appStatus: 'RUNNING', // or UNAVAILABLE
     timestamp: (new Date()).toISOString(),
     ...(req.query.verbose !== undefined) && { env: process.env }

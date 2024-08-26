@@ -55,21 +55,58 @@ async function main () {
 
   console.log('adding start to scripts in package.json')
   await exec('npm pkg set scripts.start="node -r dotenv/config ."')
+  /* #### END #### */
+
+  /*
+   * install module-alias
+   */
+  console.log('installing Module Alias (this may take a while)')
+  await exec('npm install module-alias')
+
+  console.log('adding alias for src')
+  await exec('npm pkg set _moduleAliases.@=./src')
 
   console.log('adding alias for utils')
-  await exec('npm pkg set dependencies.~utils=file:./src/utils')
+  await exec('npm pkg set _moduleAliases.@utils=./src/utils')
 
   console.log('adding alias for routes')
-  await exec('npm pkg set dependencies.~routes=file:./src/routes')
+  await exec('npm pkg set _moduleAliases.@routes=./src/routes')
 
   console.log('adding alias for models')
-  await exec('npm pkg set dependencies.~models=file:./src/models')
+  await exec('npm pkg set _moduleAliases.@models=./src/models')
 
   console.log('adding alias for services')
-  await exec('npm pkg set dependencies.~services=file:./src/connections/services')
+  await exec('npm pkg set _moduleAliases.@services=./src/connections/services')
 
   console.log('adding alias for databases')
-  await exec('npm pkg set dependencies.~databases=file:./src/connections/databases')
+  await exec('npm pkg set _moduleAliases.@databases=./src/connections/databases')
+
+  /* #### END #### */
+
+  /*
+   * install dotENV
+   */
+  console.log('installing dotENV (this may take a while)')
+  await exec('npm install --save-dev dotenv')
+
+  console.log('writing .env file')
+  await writeFile(join(projectWorkingDirectory, '.env'), 'PORT=8080')
+
+  console.log('copying development .env file')
+  await cp(join(__dirname, '..', '.env.development'), join(projectWorkingDirectory, '.env.development'))
+  /* #### END #### */
+
+  /*
+   * install Winston
+   */
+  console.log('installing Winston (this may take a while)')
+  await exec('npm install winston')
+
+  console.log('installing uuid (this may take a while)')
+  await exec('npm install uuid')
+
+  console.log('installing Short Unique Id (this may take a while)')
+  await exec('npm install short-unique-id')
   /* #### END #### */
 
   /*
@@ -91,32 +128,6 @@ async function main () {
 
   console.log('adding prestart to scripts in package.json')
   await exec('npm pkg set scripts.prestart="npm run lint"')
-  /* #### END #### */
-
-  /*
-   * install dotENV
-   */
-  console.log('installing dotENV (this may take a while)')
-  await exec('npm install --save-dev dotenv')
-
-  console.log('writing .env file')
-  await writeFile(join(projectWorkingDirectory, '.env'), 'PORT=8080')
-
-  console.log('copying .env.development file')
-  await cp(join(__dirname, '..', 'env.development'), join(projectWorkingDirectory, '.env.development'))
-  /* #### END #### */
-
-  /*
-   * install Winston
-   */
-  console.log('installing Winston (this may take a while)')
-  await exec('npm install winston')
-
-  console.log('installing uuid (this may take a while)')
-  await exec('npm install uuid')
-
-  console.log('installing Short Unique Id (this may take a while)')
-  await exec('npm install short-unique-id')
   /* #### END #### */
 
   /*
@@ -186,7 +197,7 @@ async function main () {
   })
 
   console.log('adding test to scripts in package.json')
-  await exec('npm pkg set scripts.test="NODE_ENV=test mocha"')
+  await exec('npm pkg set scripts.test="NODE_ENV=test mocha -r module-alias/register"')
   /* #### END #### */
 
   /*
@@ -270,6 +281,13 @@ async function main () {
 
     console.log('adding git remote origin')
     await exec(`git remote add origin ${gitUrl}`)
+
+    console.log('adding version to scripts in package.json')
+    // eslint-disable-next-line no-useless-escape
+    await exec('npm pkg set scripts.version:short="echo \'{ \\"short\\": \\"\'\$(git rev-parse --short HEAD)\'\\" }\' > src/version.log"')
+
+    console.log('adding prelint to scripts in package.json')
+    await exec('npm pkg set scripts.prelint="npm run version:short"')
   }
   /* #### END #### */
 }
