@@ -1,0 +1,46 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "User API",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/api/users": {
+        "get": {
+          "responses": {
+            "200": {
+              "description": "Found Users"
+            }
+          }
+        }
+      },
+      "/api/users/{userId}": {
+        "get": {
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/userId"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User found"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "parameters": {
+        "userId": {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "number",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+  
