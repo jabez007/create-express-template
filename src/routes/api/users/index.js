@@ -16,7 +16,7 @@ module.exports = require('~utils/MITchyM')({
       name: ' GET ',
       path: '/',
       callbacks: (req, res) => {
-        req.logger.debug(`Requested User: ${req.params.id}`)
+        req.logger.debug(`User Search Params: ${JSON.stringify(req.query, null, 2)}`)
 
         res.json({
           found: []
