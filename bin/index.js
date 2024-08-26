@@ -64,6 +64,9 @@ async function main () {
 
   console.log('adding alias for models')
   await exec('npm pkg set dependencies.~models=file:./src/models')
+
+  console.log('adding alias for databases')
+  await exec('npm pkg set dependencies.~databases=file:./src/databases')
   /* #### END #### */
 
   /*

@@ -26,7 +26,7 @@ module.exports = require('~utils/MITchyM')({
     {
       /**
        * @openapi
-       * /users/{id}:
+       * /users/{userId}:
        *   get:
        *     description: Fetches record for specified User
        *     responses:
@@ -34,13 +34,20 @@ module.exports = require('~utils/MITchyM')({
        *         description: Returns JSON object for specified User record
        */
       name: ' GET ',
-      path: '/:id',
-      callbacks: (req, res) => {
-        req.logger.debug(`Requested User: ${req.params.id}`)
+      path: '/:userId',
+      callbacks: async (req, res) => {
+        req.logger.debug(`Requested User: ${req.params.userId}`)
 
-        res.json(
-          User.get(req.params.id)
-        )
+        try {
+          res.json(
+            await User.get(req)
+          )
+        } catch (err) {
+          req.logger.error(err)
+          res
+            .status(err.response.status)
+            .json(err.response.data)
+        }
       }
     }
   ]
