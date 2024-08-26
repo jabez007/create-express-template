@@ -160,6 +160,12 @@ async function main () {
   console.log('installing Path to Regexp (this may take a while)')
   await exec('npm install path-to-regexp')
 
+  console.log('installing Another JSON Validator (this may take a while)')
+  await exec('npm install ajv')
+
+  console.log('installing AJV Formats (this may take a while)')
+  await exec('npm install ajv-formats')
+
   console.log('installing Swagger UI Express (this may take a while)')
   await exec('npm install swagger-ui-express')
   /* #### END #### */

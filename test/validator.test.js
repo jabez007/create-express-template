@@ -26,11 +26,22 @@ describe('validator Middleware', () => {
 
     it('should match and validate numeric userId successfully', (done) => {
         request(app)
-            .get('/api/users/123')
+            .get('/api/users/099')
             .expect(200)
             .end((err, res) => {
                 if (err) return done(err);
-                assert.strictEqual(res.body.userId, '123');
+                assert.strictEqual(res.body.userId, '099');
+                done();
+            });
+    });
+
+    it('should match but find invalid numeric userId', (done) => {
+        request(app)
+            .get('/api/users/123')
+            .expect(400)
+            .end((err, res) => {
+                if (err) return done(err);
+                assert.strictEqual(res.body.message, 'Invalid path parameter: userId');
                 done();
             });
     });

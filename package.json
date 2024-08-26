@@ -50,6 +50,8 @@
     "~routes": "file:./src/routes",
     "~services": "file:./src/connections/services",
     "~utils": "file:./src/utils",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "axios": "^1.7.3",
     "express": "^4.19.2",
     "morgan": "^1.10.0",

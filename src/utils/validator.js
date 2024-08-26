@@ -1,6 +1,6 @@
 const swaggerParser = require('swagger-parser')
-// const Ajv = require('ajv')
-// const ajvFormats = require('ajv-formats')
+const Ajv = require('ajv')
+const ajvFormats = require('ajv-formats')
 const { pathToRegexp } = require('path-to-regexp')
 
 // Convert OpenAPI path notation to Express path notation
@@ -19,7 +19,7 @@ const preprocessPaths = (paths, pathsMap) => {
 }
 
 // Extract path parameters from the match result
-const extractParamsFromPath = (matchResult, keys) => {
+const extractParamsFromUri = (matchResult, keys) => {
   const values = matchResult.slice(1)
   const params = {}
 
@@ -42,7 +42,7 @@ const matchRequestToOpenApiPath = (req, pathsMap) => {
 
     if (matchResult) {
       debug(`Found match to '${openApiPath}'`)
-      const params = extractParamsFromPath(matchResult, keys)
+      const params = extractParamsFromUri(matchResult, keys)
       debug('Parameters extracted from path', { params })
       // Check for specific regex validation
       if (keys.every((key) => !key.pattern || new RegExp(key.pattern).test(params[key.name]))) {
@@ -69,9 +69,23 @@ const mergeParameters = (pathParams = [], methodParams = []) => {
   })
 }
 
+const validatePathParameters = (params, specParameters, ajv) => {
+  specParameters
+    .filter((param) => param.in === 'path')
+    .forEach((param) => {
+      const schema = param.schema || param
+      const value = params[param.name]
+
+      const valid = ajv.validate(schema, value)
+      if (!valid) {
+        throw new Error(`Invalid ${param.in} parameter: ${param.name}`)
+      }
+    })
+}
+
 module.exports = function createValidationMiddleware (_apiSpec) {
-  // const ajv = new Ajv({ allErrors: true, coerceTypes: true })
-  // ajvFormats(ajv)
+  const ajv = new Ajv({ allErrors: true, coerceTypes: true })
+  ajvFormats(ajv)
 
   const pathsMap = []
 
@@ -100,7 +114,7 @@ module.exports = function createValidationMiddleware (_apiSpec) {
         return res.status(404).json({ message })
       }
 
-      const { path: openApiPath } = matchResult
+      const { path: openApiPath, params } = matchResult
       const pathSpec = apiSpec.paths[openApiPath]
       const methodSpec = pathSpec[req.method.toLowerCase()]
       if (!methodSpec) {
@@ -110,14 +124,18 @@ module.exports = function createValidationMiddleware (_apiSpec) {
       }
 
       const openApiParams = mergeParameters(pathSpec.parameters, methodSpec.parameters)
-      console.log(openApiParams)
+      try {
+        validatePathParameters(params, openApiParams, ajv)
+      } catch (validationError) {
+        warn(validationError.message, { details: validationError.errors })
+        res.status(400).json({ message: validationError.message, details: validationError.errors })
+      }
     }
 
     next()
     /*
     // Validate path parameters, query parameters, and request body
     try {
-      validateParameters(req, params, methodSpec, ajv)
       validateRequestBody(req, methodSpec, ajv)
       next()
     } catch (validationError) {
@@ -127,21 +145,6 @@ module.exports = function createValidationMiddleware (_apiSpec) {
   }
 }
 /*
-
-// Validate parameters (path, query)
-const validateParameters = (req, params, methodSpec, ajv) => {
-  if (methodSpec.parameters) {
-    methodSpec.parameters.forEach((param) => {
-      const value = params[param.name] || getParameterValue(req, param)
-      const schema = param.schema || param
-
-      const valid = ajv.validate(schema, value)
-      if (!valid) {
-        throw new Error(`Invalid ${param.in} parameter: ${param.name}`)
-      }
-    })
-  }
-}
 
 // Validate the request body
 const validateRequestBody = (req, methodSpec, ajv) => {
@@ -157,22 +160,6 @@ const validateRequestBody = (req, methodSpec, ajv) => {
     if (!valid) {
       throw new Error('Invalid request body')
     }
-  }
-}
-
-// Get the value of the parameter from the request
-const getParameterValue = (req, param) => {
-  switch (param.in) {
-    case 'path':
-      return req.params[param.name]
-    case 'query':
-      return req.query[param.name]
-    case 'header':
-      return req.headers[param.name.toLowerCase()]
-    case 'cookie':
-      return req.cookies[param.name]
-    default:
-      return undefined
   }
 }
 */
