@@ -8,9 +8,57 @@ on:
 
 jobs:
   run_tests:
-    uses: jabez007/create-node-template/.github/workflows/shared.test.yml@master
-    secrets: inherit
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node_version: [18.x, 20.x, 22.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: jabez007/create-node-template/.github/shared/node/test@master
+        with:
+          node_version: ${{ matrix.node_version }}
 
   test_docker:
-    uses: jabez007/create-express-template/.github/workflows/shared.build_and_test.yml@master
-    secrets: inherit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: jabez007/create-express-template/.github/shared/version@development
+
+      - uses: jabez007/aws-kubectl/.github/shared/docker@master
+        with:
+          tag: test
+          prune: false
+          debug: ${{ vars.pipeline_debug }}
+    
+      - name: Run Docker container
+        id: container_run
+        run: |
+          CONTAINER_ID=$(docker run -d -p 80:8888 ${{ github.repository }}:test | tail -n 1)
+          echo "CONTAINER_ID=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
+  
+      - name: Test Docker container
+        run: |
+          sleep 10
+          if curl --fail http://localhost/ping; then
+            echo "Server started and ping endpoint is working"
+          else
+            echo "Ping endpoint test failed"
+            exit 1
+          fi
+  
+      - name: Stop and remove Docker container
+        if: always()
+        run: |
+          docker stop ${{ steps.container_run.outputs.CONTAINER_ID }}
+          docker rm ${{ steps.container_run.outputs.CONTAINER_ID }}
+  
+      - name: Post cleanup
+        if: always()
+        run: docker image prune -f
