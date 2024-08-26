@@ -160,13 +160,13 @@ async function main () {
     await exec('npm pkg set scripts.start:docker="node ."')
 
     console.log('adding build:docker to scripts in package.json')
-    await exec(`npm pkg set scripts.build:docker="docker build -t ${dockerUser}/${folderName}"`)
+    await exec(`npm pkg set scripts.build:docker="docker build -t ${dockerUser}/${folderName}:$npm_package_version"`)
 
     console.log('adding prebuild:docker to scripts in package.json')
     await exec('npm pkg set scripts.prebuild:docker="npm run lint"')
 
     console.log('adding serve:docker to scripts in package.json')
-    await exec(`npm pkg set scripts.serve:docker="docker run --init --name ${folderName} -p 80:8080 --env-file ./.env -d ${dockerUser}/${folderName}"`)
+    await exec(`npm pkg set scripts.serve:docker="docker run --init --name ${folderName} -p 80:8080 --env-file ./.env -d ${dockerUser}/${folderName}:$npm_package_version"`)
   }
   /* #### END #### */
 
