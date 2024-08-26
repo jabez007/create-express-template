@@ -27,22 +27,28 @@ module.exports = (logger) => {
       // The message format is made from tokens, and each token is
       // defined inside the Morgan library.
       // You can create your custom token to show what do you want from a request.
-      // '[:reqid] :method :url',
-      function (tokens, req, res) {
-        return JSON.stringify({
-          traceId: tokens.traceId(req, res),
-          spanId: tokens.spanId(req, res),
-          method: tokens.method(req, res),
-          url: tokens.url(req, res)
-        })
-      },
+      (!logger?.http
+        ? '[:traceId][:spanId] :method :url'
+        : function (tokens, req, res) {
+          return JSON.stringify({
+            traceId: tokens.traceId(req, res),
+            spanId: tokens.spanId(req, res),
+            method: tokens.method(req, res),
+            url: tokens.url(req, res)
+          })
+        }
+      ),
       // Options:
       {
         // Override the stream method by telling
         // Morgan to use our custom logger instead of the console.log.
         stream: {
           // Use the http severity
-          write: (message) => log('incoming request', JSON.parse(message)) // this has a "bug" where it writes an extra newline
+          write: (message) => (
+            logger?.http
+              ? log('incoming request', JSON.parse(message))
+              : log(message) // this has a "bug" where it writes an extra newline
+          )
         },
         immediate: true,
         skip
@@ -53,23 +59,29 @@ module.exports = (logger) => {
       // The message format is made from tokens, and each token is
       // defined inside the Morgan library.
       // You can create your custom token to show what do you want from a request.
-      // '[:reqid] :status :res[content-length] - :response-time ms',
-      function (tokens, req, res) {
-        return JSON.stringify({
-          traceId: tokens.traceId(req, res),
-          spanId: tokens.spanId(req, res),
-          status: Number.parseFloat(tokens.status(req, res)),
-          contentLength: tokens.res(req, res, 'content-length') || '-',
-          responseTime: Number.parseFloat(tokens['response-time'](req, res))
-        })
-      },
+      (!logger?.http
+        ? '[:traceId][:spanId] :status :res[content-length] - :response-time ms'
+        : function (tokens, req, res) {
+          return JSON.stringify({
+            traceId: tokens.traceId(req, res),
+            spanId: tokens.spanId(req, res),
+            status: Number.parseFloat(tokens.status(req, res) || '0.0'),
+            contentLength: tokens.res(req, res, 'content-length') || '-',
+            responseTime: Number.parseFloat(tokens['response-time'](req, res) || '0.0')
+          })
+        }
+      ),
       // Options:
       {
         // Override the stream method by telling
         // Morgan to use our custom logger instead of the console.log.
         stream: {
           // Use the http severity
-          write: (message) => log('outgoing response', JSON.parse(message)) // this has a "bug" where it writes an extra newline
+          write: (message) => (
+            logger?.http
+              ? log('outgoing response', JSON.parse(message))
+              : log(message) // this has a "bug" where it writes an extra newline
+          )
         },
         skip
       }
