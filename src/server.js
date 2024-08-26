@@ -8,7 +8,7 @@ const requestId = require('~utils/request-id')
 const swaggerUi = require('swagger-ui-express')
 const openapiSpecification = require('~utils/swagger')
 const loggerMiddleware = require('~utils/loggerMiddleware')
-const { requestMorgan, responseMorgan } = require('~utils/morgan')(Logger)
+const { requestMorgan, responseMorgan } = require('~utils/morgan')(Logger())
 
 const app = express()
 
@@ -20,7 +20,7 @@ app.use(requestId())
 app.use(requestMorgan)
 app.use(responseMorgan)
 
-app.use(loggerMiddleware(Logger))
+app.use(loggerMiddleware(Logger()))
 /* END Middlewares */
 
 /*

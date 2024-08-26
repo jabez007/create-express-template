@@ -49,27 +49,31 @@ const colors = {
 winston.addColors(colors)
 
 // Chose the aspect of your log customizing the log format.
-const format = winston.format.combine(
-  // Make sure to write the stack when logging an error
-  winston.format.errors({ stack: true }),
-  // Add the message timestamp with the preferred format
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-  // Define the JSON format for pretty print
-  winston.format.json({ replacer: null, space: 2 }),
-  // winston.format.prettyPrint(),
-  // Tell Winston that the logs must be colored
-  winston.format.colorize({ all: true })
-  /*
-   * Define the format of the message showing the timestamp, the level and the message
-  winston.format.printf(
-    (info) => `${info.timestamp} ${info.level}: ${info.message}`
+const format = () => {
+  const env = process.env.NODE_ENV || 'development'
+
+  return winston.format.combine(
+    // Make sure to write the stack when logging an error
+    winston.format.errors({ stack: true }),
+    // Add the message timestamp with the preferred format
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+    // Define the JSON format for pretty print
+    (env === 'development' ? winston.format.json({ replacer: null, space: 2 }) : winston.format.json()),
+    // winston.format.prettyPrint(),
+    // Tell Winston that the logs must be colored
+    winston.format.colorize({ all: env === 'development' })
+    /*
+     * Define the format of the message showing the timestamp, the level and the message
+    winston.format.printf(
+      (info) => `${info.timestamp} ${info.level}: ${info.message}`
+    )
+     */
   )
-   */
-)
+}
 
 // Define which transports the logger must use to print out messages.
 // In this example, we are using three different transports
-const transports = [
+const defaultTransports = [
   // Allow the use of the console to print all messages
   new winston.transports.Console(),
   // Allow error level messages to print to the error.log file
@@ -79,16 +83,16 @@ const transports = [
   })
 ]
 
-// Create the logger instance that has to be exported
-// and used to log messages.
-const Logger = winston.createLogger({
-  level: level(),
-  defaultMeta: {
-    service: process.env.npm_package_name
-  },
-  levels,
-  format,
-  transports
-})
-
-module.exports = Logger
+module.exports = (transports = defaultTransports) => {
+  // Create the logger instance that has to be exported
+  // and used to log messages.
+  return winston.createLogger({
+    level: level(),
+    defaultMeta: {
+      service: process.env.npm_package_name
+    },
+    levels,
+    format: format(),
+    transports
+  })
+}
