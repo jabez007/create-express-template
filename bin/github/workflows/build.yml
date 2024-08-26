@@ -7,33 +7,18 @@ on:
       - master
 
 jobs:
-  version_app:
+  version_and_build:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Use Node.js
-        uses: actions/setup-node@v2
+      - uses: jabez007/create-express-template/.github/shared/version@master
+
+      - uses: jabez007/aws-kubectl/.github/shared/docker@master
         with:
-          node-version: 20
-
-      - name: Run version script
-        run: npm run version:short
-
-      - name: Upload version artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: short-version
-          path: src/version.log
-
-  build:
-    needs: version_app
-    permissions:
-      contents: read
-    uses: jabez007/create-express-template/.github/workflows/shared.build_and_push.yml@master
-    with:
-      artifact-name: short-version
-      artifact-path: src/
-    secrets: inherit
+          debug: ${{ vars.pipeline_debug }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    

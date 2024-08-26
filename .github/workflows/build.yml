@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - uses: jabez007/create-express-template/.github/shared/version@development
+      - uses: jabez007/create-express-template/.github/shared/version@master
 
       - uses: jabez007/aws-kubectl/.github/shared/docker@master
         with:

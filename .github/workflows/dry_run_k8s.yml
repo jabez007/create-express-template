@@ -21,12 +21,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate configmap without secrets
-        uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/configmap@development
+        uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/configmap@master
         with:
           env_files: .env , .env.common , .env.development
           debug: ${{ vars.pipeline_debug }}
 
-      - uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/deployment@development
+      - uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/deployment@master
         with:
           image_tag: latest
           debug: ${{ vars.pipeline_debug }}
@@ -39,6 +39,6 @@ jobs:
       - name: Start minikube
         run: minikube start
 
-      - uses: jabez007/create-express-template/.github/shared/kubernetes/apply@development
+      - uses: jabez007/create-express-template/.github/shared/kubernetes/apply@master
         with:
           debug: ${{ vars.pipeline_debug }}
