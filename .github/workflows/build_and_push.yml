@@ -5,6 +5,11 @@ on:
     branches:
       - main
       - master
+    paths:
+      - 'package.json'
+      - 'src/**'
+      - 'Dockerfile'
+      - '.dockerignore'
 
 jobs:
   build_and_push:
