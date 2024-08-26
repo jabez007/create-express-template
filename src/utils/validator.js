@@ -83,32 +83,55 @@ const matchRequestToOpenApiPath = (req, pathsMap) => {
   return null
 }
 
-const validatePathParameters = (params, specParameters, ajv) => {
+const validateParameters = (specParameters, params, query, header, cookies, ajv) => {
   specParameters
-    .filter((param) => param.in === 'path')
-    .forEach((param) => {
-      const schema = param.schema || param
-      const value = params[param.name]
+    .forEach((parameter) => {
+      const schema = parameter.schema || parameter
+      let value
+      // By default, OpenAPI treats all request parameters as optional
+      // Note that path parameters must have required: true, because they are always required.
+      switch (parameter.in) {
+        case 'path':
+          value = params[parameter.name]
+          break
+        case 'query':
+          value = query[parameter.name]
+          if (!value && !(parameter.required === true || parameter.required === 'true')) return
+          break
+        case 'header':
+          value = header(parameter.name)
+          if (!value && !(parameter.required === true || parameter.required === 'true')) return
+          break
+        case 'cookie':
+          value = undefined // TODO
+          if (!value && !(parameter.required === true || parameter.required === 'true')) return
+          break
+        default:
+          value = undefined
+      }
 
       const valid = ajv.validate(schema, value)
       if (!valid) {
-        throw new Error(`Invalid ${param.in} parameter: ${param.name}`)
+        throw new Error(`Invalid ${parameter.in} parameter: ${parameter.name}`)
       }
     })
 }
 
-const validateQueryParameters = (query, specParameters, ajv) => {
-  specParameters
-    .filter((param) => param.in === 'query')
-    .forEach((param) => {
-      const schema = param.schema || param
-      const value = query[param.name]
+// Validate the request body
+const validateRequestBody = (methodSpec, req, ajv) => {
+  if (methodSpec.requestBody) {
+    const contentType = req.headers['content-type'] || 'application/json'
+    const requestBodySchema = methodSpec.requestBody.content[contentType]?.schema
 
-      const valid = ajv.validate(schema, value)
-      if (!valid) {
-        throw new Error(`Invalid ${param.in} parameter: ${param.name}`)
-      }
-    })
+    if (!requestBodySchema) {
+      throw new Error(`Unsupported content type: ${contentType}`)
+    }
+
+    const valid = ajv.validate(requestBodySchema, req.body)
+    if (!valid) {
+      throw new Error('Invalid request body')
+    }
+  }
 }
 
 module.exports = function createValidationMiddleware (_apiSpec) {
@@ -157,42 +180,15 @@ module.exports = function createValidationMiddleware (_apiSpec) {
 
       const openApiParams = methodsMap[`${req.method.toLowerCase()}:${openApiPath}`] // mergeParameters(pathSpec.parameters, methodSpec.parameters)
       try {
-        validatePathParameters(params, openApiParams, ajv)
-        validateQueryParameters(req.query, openApiParams, ajv)
+        validateParameters(openApiParams, params, req.query, req.header, {}, ajv)
+        //
+        validateRequestBody(methodSpec, req, ajv)
       } catch (validationError) {
         warn(validationError.message, { details: validationError.errors })
-        res.status(400).json({ message: validationError.message, details: validationError.errors })
+        return res.status(400).json({ message: validationError.message, details: validationError.errors })
       }
     }
 
     next()
-    /*
-    // Validate path parameters, query parameters, and request body
-    try {
-      validateRequestBody(req, methodSpec, ajv)
-      next()
-    } catch (validationError) {
-      res.status(400).json({ error: validationError.message, details: validationError.errors })
-    }
-    */
   }
 }
-/*
-
-// Validate the request body
-const validateRequestBody = (req, methodSpec, ajv) => {
-  if (methodSpec.requestBody) {
-    const contentType = req.headers['content-type']
-    const requestBodySchema = methodSpec.requestBody.content[contentType]?.schema
-
-    if (!requestBodySchema) {
-      throw new Error(`Unsupported content type: ${contentType}`)
-    }
-
-    const valid = ajv.validate(requestBodySchema, req.body)
-    if (!valid) {
-      throw new Error('Invalid request body')
-    }
-  }
-}
-*/

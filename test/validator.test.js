@@ -24,6 +24,17 @@ describe('validator Middleware', () => {
 
     });
 
+    it('should match and validate without a query parameter', (done) => {
+        request(app)
+            .get('/api/users')
+            .expect(200)
+            .end((err, res) => {
+                if (err) return done(err);
+                assert.strictEqual(res.body.found, undefined);
+                done();
+            });
+    });
+
     it('should match and validate query parameter successfully', (done) => {
         request(app)
             .get('/api/users?name=Luke')
