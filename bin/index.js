@@ -208,7 +208,7 @@ async function main () {
     await exec('npm pkg set scripts.start:docker="node ."')
 
     console.log('adding build:docker to scripts in package.json')
-    await exec(`npm pkg set scripts.build:docker="docker build --platform=linux/amd64 -t ${dockerUser}/${folderName}:$npm_package_version"`)
+    await exec(`npm pkg set scripts.build:docker="docker build --platform=linux/amd64 -t ${dockerUser}/${folderName}:$npm_package_version ."`)
 
     console.log('adding prebuild:docker to scripts in package.json')
     await exec('npm pkg set scripts.prebuild:docker="npm run lint"')

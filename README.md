@@ -5,6 +5,41 @@ designed to establish a consistent foundation for API microservices with Express
 This template provides a standardized setup that simplifies the implementation of
 specific project requirements and accelerates development.
 
+## To Use
+
+```bash
+npm init git+https://github.com/jabez007/express-template.git my-express-api
+```
+
+or
+
+```bash
+npm init @jabez007/express-template my-express-api
+```
+
+then
+
+```bash
+cd ./my-express-api
+
+npm install
+
+npm run test
+
+npm run serve
+```
+
+### To Build
+
+There are two scripts that allow you to test the Docker image locally
+before pushing to Github where Github Actions will build and publish the Docker image
+
+```bash
+npm run build:docker
+
+npm run serve:docker
+```
+
 ## Middlewares
 
 This template comes pre-configured with essential middleware components to streamline development and enhance the functionality of your API.

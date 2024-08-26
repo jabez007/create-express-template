@@ -6,7 +6,7 @@
   "main": "./src/index.js",
   "scripts": {
     "prebuild:docker": "npm run lint",
-    "build:docker": "docker build --platform=linux/amd64 -t jabez07/create-express-template:$npm_package_version",
+    "build:docker": "docker build --platform=linux/amd64 -t jabez07/create-express-template:$npm_package_version .",
     "lint": "eslint --fix './src/**/*.{js,jsx,ts}'",
     "serve": "nodemon --watch src -e js,jsx --exec npm run start",
     "serve:docker": "docker run --init --name create-express-template -p 80:8080 --env-file ./.env -d jabez07/create-express-template:$npm_package_version",
