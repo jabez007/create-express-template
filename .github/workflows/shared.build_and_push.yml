@@ -18,6 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Get Short Commit Hash
+        id: git_commit
+        run: echo "short_hash=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -40,7 +44,7 @@ jobs:
           push: ${{ inputs.push }}
           # GITHUB_REPOSITORY = The owner and repository name. For example, octocat/Hello-World.
           # ghcr.io prefix makes sure we are pushing to GHCR
-          tags: ghcr.io/${{ github.repository }}:latest , ghcr.io/${{ github.repository }}:${{ github.sha }} # octocat/Hello-World:ffac537e6cbbf934b08745a378932722df287a53
+          tags: ghcr.io/${{ github.repository }}:latest , ghcr.io/${{ github.repository }}:${{ steps.git_commit.outputs.short_hash }} # octocat/Hello-World:ffac537
 
       - name: Post cleanup
         run: docker image prune -f

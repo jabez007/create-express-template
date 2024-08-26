@@ -2,8 +2,9 @@ name: Run Shared Test Workflow
 
 on:
   push:
-    branches:
-      - development
+    branches-ignore:
+      - main
+      - master
   pull_request:
     branches:
       - main
