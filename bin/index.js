@@ -153,7 +153,7 @@ async function main () {
 
   /*
    * Docker
-  */
+   */
   const usingDocker = !!(
     await askQuestion('Are you using Docker (Y/n)? ', 'y', (a) => a.trim().match(/^(y|n|yes|no)$/i) ? true : 'Please enter y or n')
   ).trim().match(/^(y|yes)$/i)
@@ -178,6 +178,15 @@ async function main () {
     console.log('adding serve:docker to scripts in package.json')
     await exec(`npm pkg set scripts.serve:docker="docker run --init --name ${folderName} -p 80:8080 --env-file ./.env -d ${dockerUser}/${folderName}:$npm_package_version"`)
   }
+  /* #### END #### */
+
+  /*
+   * Kubernetes
+   */
+  console.log('copying k8s directory')
+  await cp(join(__dirname, '..', 'k8s'), join(projectWorkingDirectory, 'k8s'), {
+    recursive: true
+  })
   /* #### END #### */
 
   /*

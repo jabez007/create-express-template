@@ -10,6 +10,7 @@ npm-debug.log
 
 **/.vscode
 **/bin
+**/k8s
 **/logs
 **/test
 .dockerignore
