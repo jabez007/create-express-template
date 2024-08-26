@@ -3,6 +3,8 @@ const Ajv = require('ajv')
 const ajvFormats = require('ajv-formats')
 const { pathToRegexp } = require('path-to-regexp')
 
+const OPENAPI_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
+
 // Convert OpenAPI path notation to Express path notation
 const convertOpenApiPathToExpress = (path) => {
   return path.replace(/{(.*?)}/g, ':$1')
@@ -15,6 +17,33 @@ const preprocessPaths = (paths, pathsMap) => {
     const regexp = pathToRegexp(expressPath)
     const keys = regexp.keys
     pathsMap.push({ regexp, keys, openApiPath })
+  })
+}
+
+// Merge parameters from path and method levels
+// Method parameters override path parameters,
+// but cannot remove path parameters
+const mergeParameters = (pathParams = [], methodParams = []) => {
+  const mapParamArrayToObject = (acc, param) => {
+    acc[`${param.in}:${param.name}`] = param
+    return acc
+  }
+
+  return Object.values({
+    ...pathParams.reduce(mapParamArrayToObject, {}),
+    ...methodParams.reduce(mapParamArrayToObject, {})
+  })
+}
+
+// Preprocess the OpenAPI methods: merge path and method parameters
+const preprocessMethods = (paths, methodsMap) => {
+  Object.keys(paths).forEach((openApiPath) => {
+    OPENAPI_METHODS.forEach((method) => {
+      methodsMap[`${method}:${openApiPath}`] = mergeParameters(
+        paths[openApiPath].parameters,
+        paths[openApiPath][method]?.parameters
+      )
+    })
   })
 }
 
@@ -54,21 +83,6 @@ const matchRequestToOpenApiPath = (req, pathsMap) => {
   return null
 }
 
-// Merge parameters from path and method levels
-// Method parameters override path parameters,
-// but cannot remove path parameters
-const mergeParameters = (pathParams = [], methodParams = []) => {
-  const mapParamArrayToObject = (acc, param) => {
-    acc[`${param.in}:${param.name}`] = param
-    return acc
-  }
-
-  return Object.values({
-    ...pathParams.reduce(mapParamArrayToObject, {}),
-    ...methodParams.reduce(mapParamArrayToObject, {})
-  })
-}
-
 const validatePathParameters = (params, specParameters, ajv) => {
   specParameters
     .filter((param) => param.in === 'path')
@@ -102,6 +116,7 @@ module.exports = function createValidationMiddleware (_apiSpec) {
   ajvFormats(ajv)
 
   const pathsMap = []
+  const methodsMap = {}
 
   // Validate the spec itself
   let apiSpec
@@ -113,6 +128,9 @@ module.exports = function createValidationMiddleware (_apiSpec) {
 
     // Preprocess paths: convert to Express notation and generate regex
     preprocessPaths(apiSpec.paths, pathsMap)
+
+    // Preprocess methods: merge path and method parameters
+    preprocessMethods(apiSpec.paths, methodsMap)
   })
 
   // Middleware function to validate requests
@@ -137,7 +155,7 @@ module.exports = function createValidationMiddleware (_apiSpec) {
         return res.status(405).json({ message })
       }
 
-      const openApiParams = mergeParameters(pathSpec.parameters, methodSpec.parameters)
+      const openApiParams = methodsMap[`${req.method.toLowerCase()}:${openApiPath}`] // mergeParameters(pathSpec.parameters, methodSpec.parameters)
       try {
         validatePathParameters(params, openApiParams, ajv)
         validateQueryParameters(req.query, openApiParams, ajv)
