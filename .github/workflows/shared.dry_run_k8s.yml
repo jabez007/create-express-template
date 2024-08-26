@@ -21,8 +21,9 @@ jobs:
           IFS=',' read -ra env_files <<< "${{ inputs.env_files }}"
           output=""
           for env_file in "${env_files[@]}"; do
-            if [ -f "$env_file" ]; then
-              output+="--from-env-file $env_file "
+            trimmed_env_file=$(echo "$env_file" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            if [ -f "$trimmed_env_file" ]; then
+              output+="--from-env-file $trimmed_env_file "
             fi
           done
           output=$(echo "$output" | sed 's/ $//')
