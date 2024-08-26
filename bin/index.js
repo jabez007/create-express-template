@@ -80,13 +80,11 @@ async function main () {
   console.log('installing Standard ESLint config (this may take a while)')
   await exec('npm install --save-dev eslint-config-standard eslint-plugin-promise eslint-plugin-import eslint-plugin-n')
 
-  console.log('writing .eslintrc file')
-  await writeFile(join(projectWorkingDirectory, '.eslintrc'), `{
-  "extends": "standard"
-}`)
+  console.log('copying eslintrc file')
+  await cp(join(__dirname, '..', '.eslintrc'), join(projectWorkingDirectory, '.eslintrc'))
 
-  console.log('writing .eslintignore file')
-  await writeFile(join(projectWorkingDirectory, '.eslintignore'), 'test')
+  console.log('writing eslintignore file')
+  await writeFile(join(projectWorkingDirectory, '.eslintignore'), 'node_modules')
 
   console.log('adding lint to scripts in package.json')
   await exec('npm pkg set scripts.lint="eslint --fix \'./src/**/*.{js,jsx,ts}\'"')
