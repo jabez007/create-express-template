@@ -27,11 +27,17 @@ module.exports = require('~utils/MITchyM')({
       /**
        * @openapi
        * /users/{userId}:
+       *   parameters:
+       *     - $ref: '#/components/parameters/userId'
        *   get:
-       *     description: Fetches record for specified User
+       *     description: Fetches record of specified User
        *     responses:
        *       200:
        *         description: Returns JSON object for specified User record
+       *         content:
+       *           application/json:
+       *             schema:
+       *               $ref: '#/components/schemas/User'
        */
       name: ' GET ',
       path: '/:userId',
@@ -52,3 +58,16 @@ module.exports = require('~utils/MITchyM')({
     }
   ]
 })
+
+/**
+ * @openapi
+ * components:
+ *   parameters:
+ *     userId:
+ *       in: path
+ *       name: userId
+ *       required: true
+ *       schema:
+ *         type: integer
+ *         format: int32
+ */
