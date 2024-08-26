@@ -34,13 +34,23 @@ app.use('/ping', require('~routes/ping'))
 /*
  * Swagger
  */
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification, {
-  explorer: false
-}))
-
 app.use('/swagger.json', (req, res) => {
   res.json(openapiSpecification)
 })
+
+const swaggerOptions = {
+  swaggerOptions: {
+    url: '/swagger.json',
+    validatorUrl: 'localhost'
+  }
+}
+
+app.use('/docs',
+  swaggerUi.serveFiles(null, swaggerOptions),
+  swaggerUi.setup(null, {
+    ...swaggerOptions,
+    explorer: false
+  }))
 /* END Swagger */
 
 module.exports = app
