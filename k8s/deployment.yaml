@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: create-express-template-deployment
+  labels:
+    app: create-express-template
 spec:
   replicas: 2 # how many copies of each pod do we want?
   strategy: # how do we want to update the pods?
