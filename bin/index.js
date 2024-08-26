@@ -55,42 +55,32 @@ async function main () {
 
   console.log('adding start to scripts in package.json')
   await exec('npm pkg set scripts.start="node -r dotenv/config ."')
-
-  console.log('adding alias for utils')
-  await exec('npm pkg set dependencies.~utils=file:./src/utils')
-
-  console.log('adding alias for routes')
-  await exec('npm pkg set dependencies.~routes=file:./src/routes')
-
-  console.log('adding alias for models')
-  await exec('npm pkg set dependencies.~models=file:./src/models')
-
-  console.log('adding alias for services')
-  await exec('npm pkg set dependencies.~services=file:./src/connections/services')
-
-  console.log('adding alias for databases')
-  await exec('npm pkg set dependencies.~databases=file:./src/connections/databases')
   /* #### END #### */
 
   /*
-   * set up ESLint
+   * install module-alias
    */
-  // console.log('installing ESLint (this may take a while)');
-  // await exec("npm install --save-dev eslint @eslint/js");
-  console.log('installing Standard ESLint config (this may take a while)')
-  await exec('npm install --save-dev eslint-config-standard eslint-plugin-promise eslint-plugin-import eslint-plugin-n')
+  console.log('installing Module Alias (this may take a while)')
+  await exec('npm install module-alias')
 
-  console.log('copying eslintrc file')
-  await cp(join(__dirname, '..', '.eslintrc'), join(projectWorkingDirectory, '.eslintrc'))
+  console.log('adding alias for src')
+  await exec('npm pkg set _moduleAliases.@=./src')
 
-  console.log('writing eslintignore file')
-  await writeFile(join(projectWorkingDirectory, '.eslintignore'), 'node_modules')
+  console.log('adding alias for utils')
+  await exec('npm pkg set _moduleAliases.@utils=./src/utils')
 
-  console.log('adding lint to scripts in package.json')
-  await exec('npm pkg set scripts.lint="eslint --fix \'./src/**/*.{js,jsx,ts}\'"')
+  console.log('adding alias for routes')
+  await exec('npm pkg set _moduleAliases.@routes=./src/routes')
 
-  console.log('adding prestart to scripts in package.json')
-  await exec('npm pkg set scripts.prestart="npm run lint"')
+  console.log('adding alias for models')
+  await exec('npm pkg set _moduleAliases.@models=./src/models')
+
+  console.log('adding alias for services')
+  await exec('npm pkg set _moduleAliases.@services=./src/connections/services')
+
+  console.log('adding alias for databases')
+  await exec('npm pkg set _moduleAliases.@databases=./src/connections/databases')
+
   /* #### END #### */
 
   /*
@@ -117,6 +107,27 @@ async function main () {
 
   console.log('installing Short Unique Id (this may take a while)')
   await exec('npm install short-unique-id')
+  /* #### END #### */
+
+  /*
+   * set up ESLint
+   */
+  // console.log('installing ESLint (this may take a while)');
+  // await exec("npm install --save-dev eslint @eslint/js");
+  console.log('installing Standard ESLint config (this may take a while)')
+  await exec('npm install --save-dev eslint-config-standard eslint-plugin-promise eslint-plugin-import eslint-plugin-n')
+
+  console.log('copying eslintrc file')
+  await cp(join(__dirname, '..', '.eslintrc'), join(projectWorkingDirectory, '.eslintrc'))
+
+  console.log('writing eslintignore file')
+  await writeFile(join(projectWorkingDirectory, '.eslintignore'), 'node_modules')
+
+  console.log('adding lint to scripts in package.json')
+  await exec('npm pkg set scripts.lint="eslint --fix \'./src/**/*.{js,jsx,ts}\'"')
+
+  console.log('adding prestart to scripts in package.json')
+  await exec('npm pkg set scripts.prestart="npm run lint"')
   /* #### END #### */
 
   /*
@@ -186,7 +197,7 @@ async function main () {
   })
 
   console.log('adding test to scripts in package.json')
-  await exec('npm pkg set scripts.test="NODE_ENV=test mocha"')
+  await exec('npm pkg set scripts.test="NODE_ENV=test mocha -r module-alias/register"')
   /* #### END #### */
 
   /*

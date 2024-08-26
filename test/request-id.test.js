@@ -1,5 +1,5 @@
 const assert = require('assert')
-const requestId = require('~utils/request-id')
+const requestId = require('@utils/request-id')
 const { createRequest, createResponse } = require('node-mocks-http')
 
 describe('requestId Middleware', () => {

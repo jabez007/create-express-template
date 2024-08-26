@@ -1,4 +1,4 @@
-module.exports = require('~utils/MITchyM')({
+module.exports = require('@utils/MITchyM')({
   dirname: __dirname,
   methods: [
     {

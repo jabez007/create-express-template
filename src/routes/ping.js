@@ -1,7 +1,7 @@
 const { join } = require('path')
 const router = require('express').Router()
 const { existsSync, readFileSync } = require('fs')
-const openapiSpecification = require('~utils/swagger')
+const openapiSpecification = require('@utils/swagger')
 
 const VERSION_PATH = join(__dirname, '..', 'version.log')
 

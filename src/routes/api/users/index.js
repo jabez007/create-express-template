@@ -1,6 +1,6 @@
-const User = require('~models/user')
+const User = require('@models/user')
 
-module.exports = require('~utils/MITchyM')({
+module.exports = require('@utils/MITchyM')({
   dirname: __dirname,
   methods: [
     {

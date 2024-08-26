@@ -14,7 +14,7 @@
     "prestart": "npm run lint",
     "start": "node -r dotenv/config .",
     "start:docker": "node .",
-    "test": "NODE_ENV=test mocha",
+    "test": "NODE_ENV=test mocha -r module-alias/register",
     "version:short": "echo '{ \"short\": \"'$(git rev-parse --short HEAD)'\" }' > src/version.log"
   },
   "repository": {
@@ -47,15 +47,11 @@
     "supertest": "^7.0.0"
   },
   "dependencies": {
-    "~databases": "file:./src/connections/databases",
-    "~models": "file:./src/models",
-    "~routes": "file:./src/routes",
-    "~services": "file:./src/connections/services",
-    "~utils": "file:./src/utils",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "axios": "^1.7.3",
     "express": "^4.19.2",
+    "module-alias": "^2.2.3",
     "morgan": "^1.10.0",
     "path-to-regexp": "^7.1.0",
     "short-unique-id": "^5.2.0",
@@ -64,5 +60,13 @@
     "swagger-ui-express": "^5.0.1",
     "uuid": "^10.0.0",
     "winston": "^3.13.1"
+  },
+  "_moduleAliases": {
+    "@": "./src",
+    "@databases": "./src/connections/databases",
+    "@models": "./src/models",
+    "@routes": "./src/routes",
+    "@services": "./src/connections/services",
+    "@utils": "./src/utils"
   }
 }

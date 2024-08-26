@@ -4,7 +4,7 @@ const express = require('express')
 const request = require('supertest')
 const bodyParser = require('body-parser')
 const apiSpec = require('./validator.openapi.json')
-const createValidationMiddleware = require('~utils/validator')
+const createValidationMiddleware = require('@utils/validator')
 
 describe('validator Middleware', () => {
   let app

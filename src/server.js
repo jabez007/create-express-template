@@ -3,13 +3,13 @@
  * i.e. Middleware and Routes
  */
 const express = require('express')
-const Logger = require('~utils/winston')
-const requestId = require('~utils/request-id')
+const Logger = require('@utils/winston')
+const requestId = require('@utils/request-id')
 const swaggerUi = require('swagger-ui-express')
-const swaggerValidator = require('~utils/validator')
-const openapiSpecification = require('~utils/swagger')
-const loggerMiddleware = require('~utils/loggerMiddleware')
-const { requestMorgan, responseMorgan } = require('~utils/morgan')(Logger())
+const swaggerValidator = require('@utils/validator')
+const openapiSpecification = require('@utils/swagger')
+const loggerMiddleware = require('@utils/loggerMiddleware')
+const { requestMorgan, responseMorgan } = require('@utils/morgan')(Logger())
 
 const app = express()
 
@@ -29,9 +29,9 @@ app.use(swaggerValidator(openapiSpecification))
 /*
  * Routes
  */
-app.use('/api', require('~routes/api'))
+app.use('/api', require('@routes/api'))
 
-app.use('/ping', require('~routes/ping'))
+app.use('/ping', require('@routes/ping'))
 /* END Routes */
 
 /*

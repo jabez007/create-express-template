@@ -1,4 +1,4 @@
-const svcAgent = require('~utils/axios')
+const svcAgent = require('@utils/axios')
 
 const swapiClient = svcAgent({
   axiosConfig: {
