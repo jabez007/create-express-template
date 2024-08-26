@@ -50,7 +50,8 @@ app.use('/docs',
   swaggerUi.setup(null, {
     ...swaggerOptions,
     explorer: false
-  }))
+  })
+)
 /* END Swagger */
 
 module.exports = app
