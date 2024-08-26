@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: create-express-template
-          image: jabez07/create-express-template:<git-hash>
+          image: CONTAINER_IMAGE
           imagePullPolicy: Always
           resources:
             limits:

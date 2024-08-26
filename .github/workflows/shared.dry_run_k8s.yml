@@ -13,7 +13,7 @@ jobs:
     
       - name: Update deployment manifest
         if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
-        run: sed -i 's|<git-hash>|${{ github.sha }}|g' k8s/deployment.yaml
+        run: sed -i 's|CONTAINER_IMAGE|ghcr.io/${{ github.repository }}:latest|g' k8s/deployment.yaml
       
       - name: Show deployment manifest after update
         if: ${{ hashFiles('k8s/deployment.yaml') != '' && vars.PIPELINE_DEBUG == 'true' }}
