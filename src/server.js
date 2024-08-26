@@ -1,8 +1,9 @@
 const express = require('express')
+const Logger = require('~utils/winston')
 const requestId = require('~utils/request-id')
 const openapiSpecification = require('~utils/swagger')
 const loggerMiddleware = require('~utils/loggerMiddleware')
-const { requestMorgan, responseMorgan } = require('~utils/morgan')
+const { requestMorgan, responseMorgan } = require('~utils/morgan')(Logger)
 
 const app = express()
 
@@ -11,7 +12,7 @@ app.use(requestId())
 app.use(requestMorgan)
 app.use(responseMorgan)
 
-app.use(loggerMiddleware)
+app.use(loggerMiddleware(Logger))
 
 app.get('/', (req, res) => {
   req.logger.error('This is an error log')

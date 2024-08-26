@@ -1,20 +1,20 @@
-const Logger = require('~utils/winston')
-
-module.exports = function (request, response, next) {
-  request.logger = {
-    debug: (message) => {
-      Logger.debug(`[${request.id}] ${message}`)
-    },
-    info: (message) => {
-      Logger.info(`[${request.id}] ${message}`)
-    },
-    warn: (message) => {
-      Logger.warn(`[${request.id}] ${message}`)
-    },
-    error: (message) => {
-      Logger.error(`[${request.id}] ${message}`)
+module.exports = (logger) => {
+  return function (request, response, next) {
+    request.logger = {
+      debug: (message) => {
+        logger.debug(`[${request.id}] ${message}`)
+      },
+      info: (message) => {
+        logger.info(`[${request.id}] ${message}`)
+      },
+      warn: (message) => {
+        logger.warn(`[${request.id}] ${message}`)
+      },
+      error: (message) => {
+        logger.error(`[${request.id}] ${message}`)
+      }
     }
-  }
 
-  next()
+    next()
+  }
 }
