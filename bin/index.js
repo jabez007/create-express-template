@@ -164,6 +164,9 @@ async function main () {
 
     console.log('adding prebuild:docker to scripts in package.json')
     await exec('npm pkg set scripts.prebuild:docker="npm run lint"')
+
+    console.log('adding serve:docker to scripts in package.json')
+    await exec(`npm pkg set scripts.serve:docker="docker run --name ${folderName} -p 80:8080 -d ${dockerUser}/${folderName}"`)
   }
   /* #### END #### */
 
