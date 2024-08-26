@@ -15,5 +15,5 @@ jobs:
     secrets: inherit
 
   test_docker:
-    uses: jabez007/create-node-template/.github/workflows/shared.build_and_test.yml@development
+    uses: jabez007/create-express-template/.github/workflows/shared.build_and_test.yml@development
     secrets: inherit
