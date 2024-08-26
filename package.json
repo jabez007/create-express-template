@@ -13,7 +13,7 @@
     "prestart": "npm run lint",
     "start": "node .",
     "start:docker": "node .",
-    "test": "mocha"
+    "test": "NODE_ENV=test mocha"
   },
   "repository": {
     "type": "git",
@@ -45,6 +45,7 @@
   "dependencies": {
     "~routes": "file:./src/routes",
     "~utils": "file:./src/utils",
+    "axios": "^1.7.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "morgan": "^1.10.0",
