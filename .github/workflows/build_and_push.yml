@@ -27,3 +27,5 @@ jobs:
         with:
           push: true
           debug: ${{ vars.pipeline_debug }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
