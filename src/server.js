@@ -1,5 +1,6 @@
 const express = require('express')
 const requestId = require('~utils/request-id')
+const openapiSpecification = require('~utils/swagger')
 const loggerMiddleware = require('~utils/loggerMiddleware')
 const { requestMorgan, responseMorgan } = require('~utils/morgan')
 
@@ -24,5 +25,9 @@ app.get('/', (req, res) => {
 app.use('/api', require('~routes/api'))
 
 app.use('/ping', require('~routes/ping'))
+
+app.use('/swagger.json', (req, res) => {
+  res.json(openapiSpecification)
+})
 
 module.exports = app
