@@ -1,8 +1,12 @@
 const axios = require('axios')
-const { v4 } = require('uuid')
+const ShortUniqueId = require('short-unique-id')
 
-function generateV4UUID (_request) {
-  return v4()
+const suid = new ShortUniqueId({
+  dictionary: 'hex'
+})
+
+function generateSUID (_request) {
+  return suid.formattedUUID('$r4-$r2-$r2-$r2-$r6')
 }
 
 /**
@@ -17,7 +21,7 @@ function generateV4UUID (_request) {
 module.exports = function svcAgent ({
   traceIdHeader = 'X-Request-Id',
   spanIdHeader = 'X-svc2svc-Id',
-  generator = generateV4UUID,
+  generator = generateSUID,
   axiosConfig = {}
 } = {}) {
   return function (expressRequest) {
@@ -37,7 +41,7 @@ module.exports = function svcAgent ({
 
     client.interceptors.request.use((req) => {
       const spanId = generator(expressRequest)
-      info(`sending request ${spanId}`)
+      info(`sending request ${spanId}`, { childSpanId: spanId })
       req.headers.set(spanIdHeader, spanId)
       debug('sending request', { axios: req })
       return req
@@ -55,7 +59,7 @@ module.exports = function svcAgent ({
       })
       const spanId = res.headers[spanIdHeader]
       if (spanId) {
-        info(`received response ${spanId}`)
+        info(`received response ${spanId}`, { childSpanId: spanId })
       }
       return res
     }, (err) => {

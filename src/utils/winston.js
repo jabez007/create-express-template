@@ -55,8 +55,8 @@ const format = winston.format.combine(
   // Add the message timestamp with the preferred format
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   // Define the JSON format for pretty print
-  winston.format.json({ replacer: null, value: 2 }),
-  winston.format.prettyPrint(),
+  winston.format.json({ replacer: null, space: 2 }),
+  // winston.format.prettyPrint(),
   // Tell Winston that the logs must be colored
   winston.format.colorize({ all: true })
   /*
