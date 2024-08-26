@@ -1,5 +1,4 @@
 const express = require('express')
-const ping = require('~routes/ping')
 const requestId = require('~utils/request-id')
 const loggerMiddleware = require('~utils/loggerMiddleware')
 const { requestMorgan, responseMorgan } = require('~utils/morgan')
@@ -22,6 +21,8 @@ app.get('/', (req, res) => {
   res.send('Hello World')
 })
 
-app.use('/ping', ping)
+app.use('/api', require('~routes/api'))
+
+app.use('/ping', require('~routes/ping'))
 
 module.exports = app
