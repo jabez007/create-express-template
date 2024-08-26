@@ -6,15 +6,15 @@ const express = require('express')
  * @callback MITchyM_Callback
  * @param {Object} req - Express Request
  * @param {Object} res - Express Response
- * @param {Function} next - Express Next function
+ * @param {function(): void} next - Express Next function
  */
 
 /**
  * Generate a MITchyM Router
  * @param {Object} param0
  * @param {Object[]} param0.methods - The methods, paths, and callbacks for this level of the router
- * @param {String} param0.methods[].name - The HTTP method (POST, GET, PUT, PATCH, DELETE) that will invoke the callbacks
- * @param {String} param0.methods[].path - A string, path pattern, or regular expression pattern representing a relative URI path
+ * @param {string} param0.methods[].name - The HTTP method (POST, GET, PUT, PATCH, DELETE) that will invoke the callbacks
+ * @param {string} param0.methods[].path - A string, path pattern, or regular expression pattern representing a relative URI path
  * @param {MITchyM_Callback} param0.methods[].callbacks - Function to be invoked for this HTTP method and relative URI path combination
  * @returns {Object} Express Router
  */
