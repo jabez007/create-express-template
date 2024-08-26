@@ -18,15 +18,6 @@ app.use(responseMorgan)
 
 app.use(loggerMiddleware(Logger))
 
-app.get('/', (req, res) => {
-  req.logger.error('This is an error log')
-  req.logger.warn('This is a warn log')
-  req.logger.info('This is a info log')
-  req.logger.debug('This is a debug log')
-
-  res.send('Hello World')
-})
-
 app.use('/api', require('~routes/api'))
 
 app.use('/ping', require('~routes/ping'))
