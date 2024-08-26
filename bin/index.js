@@ -218,6 +218,11 @@ async function main () {
     console.log('adding node gitignore')
     await exec('npx gitignore node')
 
+    console.log('copying github directory')
+    await cp(join(__dirname, 'github'), join(projectWorkingDirectory, '.github'), {
+      recursive: true
+    })
+
     console.log('git init')
     await exec('git init')
 
