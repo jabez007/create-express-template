@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: create-express-template-service #!IMPORTANT: this is the name used by other containers in the cluster to reach theses pods
+  labels:
+    app: create-express-template
+spec:
+  type: ClusterIP # this service will only be accessible from within the Kubernetes cluster
+  selector: # forward requests to pods with these label values
+    # must match ALL the labels set on the pod
+    app: create-express-template
+  ports:
+  - port: 8080 # exposed internally to the cluster
