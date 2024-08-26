@@ -41,6 +41,6 @@ jobs:
     uses: jabez007/create-express-template/.github/workflows/shared.build_and_push.yml@master
     with:
       artifact-name: short-version
-      artifact-path: src/version.log
+      artifact-path: src/
       push: true
     secrets: inherit

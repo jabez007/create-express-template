@@ -5,10 +5,6 @@ on:
     branches-ignore:
       - main
       - master
-  pull_request:
-    branches:
-      - main
-      - master
 
 jobs:
   run_tests:
@@ -16,5 +12,5 @@ jobs:
     secrets: inherit
 
   test_docker:
-    uses: jabez007/create-express-template/.github/workflows/shared.build_and_test.yml@development
+    uses: jabez007/create-express-template/.github/workflows/shared.build_and_test.yml@master
     secrets: inherit
