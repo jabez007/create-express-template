@@ -64,17 +64,16 @@ jobs:
         if: ${{ ! inputs.push }}
         uses: docker/build-push-action@v4
         with:
-          platforms: ${{ inputs.platforms }}
           context: .
           tags: ${{ github.repository }}:${{ steps.git_commit.outputs.short_hash }}
-          outputs: type=docker,dest=/tmp/${{ github.repository }}.tar
+          outputs: type=docker,dest=/tmp/${{ github.event.repository.name }}.tar
 
       - name: Upload image artifacts
         if: ${{ ! inputs.push }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.git_commit.outputs.short_hash }}
-          path: /tmp/${{ github.repository }}.tar
+          path: /tmp/${{ github.event.repository.name }}.tar
 
       - name: Post cleanup
         run: docker image prune -f
