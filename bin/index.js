@@ -177,16 +177,28 @@ async function main () {
 
     console.log('adding serve:docker to scripts in package.json')
     await exec(`npm pkg set scripts.serve:docker="docker run --init --name ${folderName} -p 80:8080 --env-file ./.env -d ${dockerUser}/${folderName}:$npm_package_version"`)
-  }
-  /* #### END #### */
 
-  /*
-   * Kubernetes
-   */
-  console.log('copying k8s directory')
-  await cp(join(__dirname, '..', 'k8s'), join(projectWorkingDirectory, 'k8s'), {
-    recursive: true
-  })
+    /*
+     * Kubernetes
+     */
+    console.log('copying k8s directory')
+    await cp(join(__dirname, '..', 'k8s'), join(projectWorkingDirectory, 'k8s'), {
+      recursive: true
+    })
+
+    console.log('updating k8s manifests')
+    fs.readdirSync(join(projectWorkingDirectory, 'k8s'))
+      .filter((file) => file.endsWith('.yaml'))
+      .forEach((file) => {
+        fs.writeFileSync(
+          join(projectWorkingDirectory, 'k8s', file),
+          fs.readFileSync(join(projectWorkingDirectory, 'k8s', file), 'utf-8')
+            .replace(/jabez07/g, dockerUser)
+            .replace(/create-express-template/g, folderName)
+        )
+      })
+    /* #### END #### */
+  }
   /* #### END #### */
 
   /*
