@@ -4,7 +4,7 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Hello World',
+      title: process.env.npm_package_name,
       version: '1.0.0'
     }
   },
