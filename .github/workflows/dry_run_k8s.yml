@@ -28,7 +28,6 @@ jobs:
 
       - uses: jabez007/create-express-template/.github/shared/kubernetes/manifests/deployment@development
         with:
-          container_registry: ghcr.io
           image_tag: latest
           debug: ${{ vars.pipeline_debug }}
     
