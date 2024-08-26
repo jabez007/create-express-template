@@ -53,7 +53,8 @@ module.exports = function svcAgent ({
     client.interceptors.response.use((res) => {
       debug('received response', {
         axios: {
-          header: res.headers,
+          status: res.status,
+          headers: res.headers,
           data: res.data
         }
       })

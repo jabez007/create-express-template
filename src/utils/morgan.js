@@ -19,6 +19,8 @@ morgan.token('spanId', function (req, res) {
 })
 
 module.exports = (logger) => {
+  const log = logger?.http || console.log
+
   return {
     requestMorgan: morgan(
       // Define message format string.
@@ -40,7 +42,7 @@ module.exports = (logger) => {
         // Morgan to use our custom logger instead of the console.log.
         stream: {
           // Use the http severity
-          write: (message) => logger.http('incoming request', JSON.parse(message)) // this has a "bug" where it writes an extra newline
+          write: (message) => log('incoming request', JSON.parse(message)) // this has a "bug" where it writes an extra newline
         },
         immediate: true,
         skip
@@ -57,7 +59,7 @@ module.exports = (logger) => {
           traceId: tokens.traceId(req, res),
           spanId: tokens.spanId(req, res),
           status: Number.parseFloat(tokens.status(req, res)),
-          contentLength: tokens.res(req, res, 'content-length'),
+          contentLength: tokens.res(req, res, 'content-length') || '-',
           responseTime: Number.parseFloat(tokens['response-time'](req, res))
         })
       },
@@ -67,7 +69,7 @@ module.exports = (logger) => {
         // Morgan to use our custom logger instead of the console.log.
         stream: {
           // Use the http severity
-          write: (message) => logger.http('outgoing response', JSON.parse(message)) // this has a "bug" where it writes an extra newline
+          write: (message) => log('outgoing response', JSON.parse(message)) // this has a "bug" where it writes an extra newline
         },
         skip
       }
