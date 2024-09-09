@@ -19,41 +19,30 @@ runs:
 
     ####
 
-    - name: Apply configmap
-      if: ${{ hashFiles('k8s/configmap.yaml') != '' }}
-      run: kubectl apply -f k8s/configmap.yaml ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
-      shell: bash
-
-    - name: Describe configmap
-      if: ${{ hashFiles('k8s/configmap.yaml') != '' && inputs.dry_run != 'true' && inputs.debug == 'true' }}
-      run: kubectl describe cm $(yq -r .metadata.name k8s/configmap.yaml)
+    - name: Apply all manifests
+      run: |
+        for file in k8s/*.yaml k8s/*.yml; do
+          kubectl apply -f $file ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
+        done
       shell: bash
 
     ####
 
-    - name: Apply deployment
-      if: ${{ hashFiles('k8s/deployment.yaml') != '' }}
-      run: kubectl apply -f k8s/deployment.yaml ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
+    - name: Describe resources
+      if: ${{ inputs.debug == 'true' && inputs.dry_run != 'true' }}
+      run: |
+        for file in k8s/*.yaml k8s/*.yml; do
+          kind=$(yq -r .kind $file)
+          name=$(yq -r .metadata.name $file)
+          kubectl describe $kind $name
+        done
       shell: bash
 
-    - name: Describe deployment
-      if: ${{ hashFiles('k8s/deployment.yaml') != '' && inputs.dry_run != 'true' && inputs.debug == 'true' }}
-      run: kubectl describe deploy $(yq -r .metadata.name k8s/deployment.yaml)
-      shell: bash
+    ####
 
     - name: Check deployment rollout status
-      if: ${{ hashFiles('k8s/deployment.yaml') != '' && inputs.dry_run != 'true' }}
+      if: ${{ (hashFiles('k8s/deployment.yaml') != '' || hashFiles('k8s/deployment.yml') != '') && inputs.dry_run != 'true' }}
       run: kubectl rollout status deploy $(yq -r .metadata.name k8s/deployment.yaml)
       shell: bash
 
     ####
-
-    - name: Apply service
-      if: ${{ hashFiles('k8s/service.yaml') != '' }}
-      run: kubectl apply -f k8s/service.yaml ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
-      shell: bash
-
-    - name: Describe service
-      if: ${{ hashFiles('k8s/service.yaml') != '' && inputs.dry_run != 'true' && inputs.debug == 'true' }}
-      run: kubectl describe svc $(yq -r .metadata.name k8s/service.yaml)
-      shell: bash
