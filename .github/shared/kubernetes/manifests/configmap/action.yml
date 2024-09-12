@@ -19,7 +19,7 @@ runs:
         IFS=',' read -ra env_files <<< "${{ inputs.env_files }}"
         output=""
         for env_file in "${env_files[@]}"; do
-          trimmed_env_file=$(echo "$env_file" | sed 's|^[[:space:]]*||;s|[[:space:]]*$||' | sed -e 's|[&|]|\\&|g')
+          trimmed_env_file=$(echo "$env_file" | sed 's|^[[:space:]]*||;s|[[:space:]]*$||' | sed -e 's|[&|$]|\\&|g')
           if [ -f "$trimmed_env_file" ]; then
             output+="--from-env-file $trimmed_env_file "
           fi
@@ -59,7 +59,7 @@ runs:
             echo "Env variable name: $VARIABLE_NAME"
             echo "Value of variable: $(echo $GH_SECRETS | jq -r .$VARIABLE_NAME)"
             echo "Replacing @@$VARIABLE_NAME@@ with $(echo $GH_SECRETS | jq -r .$VARIABLE_NAME)"
-            sed -i "s|@@$VARIABLE_NAME@@|$(echo $GH_SECRETS | jq -r .$VARIABLE_NAME | sed -e 's|[&/\]|\\&|g')|" k8s/configmap.yaml
+            sed -i "s|@@$VARIABLE_NAME@@|$(echo $GH_SECRETS | jq -r .$VARIABLE_NAME | sed -e 's|[&|$.*^/\]|\\&|g')|" k8s/configmap.yaml
           fi
         done < k8s/configmap.yaml
       shell: bash
