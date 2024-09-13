@@ -19,11 +19,35 @@ runs:
 
     ####
 
-    - name: Apply all manifests
+    - name: Dry run all manifests
+      if: ${{ inputs.dry_run == 'true' }}
       run: |
         for file in k8s/*.yaml k8s/*.yml; do
           if [ -e "$file" ]; then
-            kubectl apply -f $file ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
+            kubectl apply -f "$file" ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
+          fi
+        done
+      shell: bash
+
+    - name: Apply all manifests
+      if: ${{ inputs.dry_run != 'true' }}
+      run: |
+        for file in k8s/*.yaml k8s/*.yml; do
+          if [ -e "$file" ]; then
+            if kubectl diff -f "$file" > /dev/null; then
+              kind=$(yq -r .kind "$file" | tr '[:upper:]' '[:lower:]')
+              case "$kind" in
+                deployment|statefulset|daemonset)
+                  name=$(yq -r .metadata.name "$file")
+                  kubectl rollout restart "$kind" "$name"
+                  ;;
+                *)
+                  echo "Resource type $kind does not support rollout restart."
+                  ;;
+              esac
+            else
+              kubectl apply -f "$file"
+            fi
           fi
         done
       shell: bash
@@ -35,9 +59,9 @@ runs:
       run: |
         for file in k8s/*.yaml k8s/*.yml; do
           if [ -e "$file" ]; then
-            kind=$(yq -r .kind $file)
-            name=$(yq -r .metadata.name $file)
-            kubectl describe $kind $name
+            kind=$(yq -r .kind "$file")
+            name=$(yq -r .metadata.name "$file")
+            kubectl describe "$kind" "$name"
           fi
         done
       shell: bash
