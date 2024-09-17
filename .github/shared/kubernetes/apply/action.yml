@@ -12,25 +12,43 @@ inputs:
 runs:
   using: composite
   steps:
+  
+    - name: Check branch
+      id: check_branch
+      run: echo "branch_name=$(echo $GITHUB_REF | sed 's|refs/heads/||')" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Validate dry_run usage
+      id: if_production
+      run: |
+        if [[ "$branch_name" == "main" || "$branch_name" == "master" ]]; then
+          echo "dry_run=${{ inputs.dry_run }}" >> "$GITHUB_OUTPUT"
+        else
+          echo "dry_run=true" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+
+    ####
+  
     - name: Test kubectl access
-      if: ${{ inputs.debug == 'true' }}
+      if: ${{ steps.if_production.outputs.dry_run != 'true' && inputs.debug == 'true' }}
       run: kubectl get pods
       shell: bash
 
     ####
 
     - name: Dry run all manifests
-      if: ${{ inputs.dry_run == 'true' }}
+      if: ${{ steps.if_production.outputs.dry_run == 'true' }}
       run: |
         for file in k8s/*.yaml k8s/*.yml; do
           if [ -e "$file" ]; then
-            kubectl apply -f "$file" ${{ inputs.dry_run == 'true' && '--dry-run=client' || '' }}
+            kubectl apply -f "$file" ${{ steps.if_production.outputs.dry_run == 'true' && '--dry-run=client' || '' }}
           fi
         done
       shell: bash
 
     - name: Apply all manifests
-      if: ${{ inputs.dry_run != 'true' }}
+      if: ${{ steps.if_production.outputs.dry_run != 'true' }}
       run: |
         for file in k8s/*.yaml k8s/*.yml; do
           if [ -e "$file" ]; then
@@ -55,7 +73,7 @@ runs:
     ####
 
     - name: Describe resources
-      if: ${{ inputs.debug == 'true' && inputs.dry_run != 'true' }}
+      if: ${{ steps.if_production.outputs.dry_run != 'true' && inputs.debug == 'true' }}
       run: |
         for file in k8s/*.yaml k8s/*.yml; do
           if [ -e "$file" ]; then
@@ -69,7 +87,7 @@ runs:
     ####
 
     - name: Check deployment rollout status
-      if: ${{ (hashFiles('k8s/deployment.yaml') != '' || hashFiles('k8s/deployment.yml') != '') && inputs.dry_run != 'true' }}
+      if: ${{ (hashFiles('k8s/deployment.yaml') != '' || hashFiles('k8s/deployment.yml') != '') && steps.if_production.outputs.dry_run != 'true' }}
       run: |
         if [ -f k8s/deployment.yaml ]; then
           kubectl rollout status deploy $(yq -r .metadata.name k8s/deployment.yaml)
