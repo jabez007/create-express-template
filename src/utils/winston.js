@@ -25,6 +25,7 @@ const level = () => {
     case 'test':
       return 'error'
 
+    case 'local':  
     case 'development':
       return 'debug'
 
@@ -58,14 +59,7 @@ const format = () => {
     // Add the message timestamp with the preferred format
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
     // Define the JSON format for pretty print
-    (env === 'development' ? winston.format.json({ replacer: null, space: 2 }) : winston.format.json())
-    // winston.format.prettyPrint(),
-    /*
-     * Define the format of the message showing the timestamp, the level and the message
-    winston.format.printf(
-      (info) => `${info.timestamp} ${info.level}: ${info.message}`
-    )
-     */
+    (['local'].includes(env) ? winston.format.json({ replacer: null, space: 2 }) : winston.format.json()
   )
 }
 
@@ -79,14 +73,19 @@ const defaultTransports = () => {
     new winston.transports.Console({
       format: winston.format.combine(
         // Tell Winston that the logs must be colored
-        winston.format.colorize({ all: env === 'development' })
+        winston.format.colorize({ all: env === 'local' })
       )
     }),
-    // Allow error level messages to print to the error.log file
-    new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error'
-    })
+    ...(['local'].includes(env)
+      ? [
+        new winston.transports.File({
+          // Allow error level messages to print to the error.log file
+          filename: 'logs/error.log',
+          level: 'error'
+        })
+      ]
+      : []
+    )
   ]
 }
 
@@ -105,6 +104,6 @@ module.exports = (transports = defaultTransports()) => {
     transports,
     exceptionHandlers: transports,
     rejectionHandlers: transports,
-    exitOnError: env !== 'development'
+    exitOnError: !(['local', 'development'].includes(env))
   })
 }
