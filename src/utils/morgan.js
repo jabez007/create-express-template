@@ -5,7 +5,9 @@ const morgan = require('morgan')
 // This method is not really needed here since
 // we already told to the logger that it should
 // print only error messages in test.
-const skip = () => {
+const skip = (req) => {
+  if (req.url === '/ping') return true
+
   const env = process.env.NODE_ENV || 'development'
   return env === 'test'
 }
