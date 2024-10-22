@@ -1,9 +1,17 @@
+const crypto = require('crypto');
 const { v4 } = require('uuid')
 
 function generateV4UUID (_request) {
   return v4()
 }
 
+function generateHash(_request) {
+	const hash = crypto.createHash('sha1');
+	hash.update(v4(_request));
+	return hash.digest('hex');
+}
+
+const CORRELATION_ATTRIBUTE_NAME = 'correlationId'
 const TRACE_ATTRIBUTE_NAME = 'traceId'
 const SPAN_ATTRIBUTE_NAME = 'spanId'
 
@@ -20,6 +28,11 @@ const SPAN_ATTRIBUTE_NAME = 'spanId'
  * @returns {function(ExpressRequest, ExpressResponse, ExpressNextFunction): void} - The middleware function to be passed to Express
  */
 module.exports = function requestId ({
+  correlation = {
+		generator: generateHash,
+		headerName: 'X-Correlation-Id',
+		setHeader: true
+	},
   trace = {
     generator: generateV4UUID,
     headerName: 'X-Request-Id',
@@ -31,6 +44,19 @@ module.exports = function requestId ({
   }
 } = {}) {
   return function (request, response, next) {
+    /*
+		 * Correlation Id
+		 */
+		const incomingCorrelationId = request.get(correlation.headerName)
+    const correlationId = incomingCorrelationId === undefined ? correlation.generator(request) : incomingCorrelationId
+
+		if (correlation.setHeader) {
+			response.set(correlation.headerName, correlationId)
+		}
+
+		request[CORRELATION_ATTRIBUTE_NAME] = correlationId
+		/* END Correlation Id */
+    
     /*
      * Trace Id
      */
