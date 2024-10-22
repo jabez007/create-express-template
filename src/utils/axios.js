@@ -19,6 +19,7 @@ function generateSUID (_request) {
  * @returns {function(ExpressRequest): AxiosInstance} - A function to use in the Express route handlers to create any needed Axios instances
  */
 module.exports = function svcAgent ({
+  correlationIdHeader = 'X-Correlation-Id',
   traceIdHeader = 'X-Request-Id',
   spanIdHeader = 'X-svc2svc-Id',
   generator = generateSUID,
@@ -30,6 +31,7 @@ module.exports = function svcAgent ({
     const error = process.env.NODE_ENV === 'test' ? () => {} : expressRequest.logger?.error || console.error
 
     const defaultHeaders = new axios.AxiosHeaders(axiosConfig.headers)
+    defaultHeaders.set(correlationIdHeader, expressRequest.correlationId)
     defaultHeaders.set(traceIdHeader, expressRequest.traceId)
 
     const client = axios.create({
