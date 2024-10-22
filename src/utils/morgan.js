@@ -12,6 +12,10 @@ const skip = (req) => {
   return env === 'test'
 }
 
+morgan.token('correlationId', function (req, res) {
+  return req.correlationId
+})
+
 morgan.token('traceId', function (req, res) {
   return req.traceId
 })
@@ -33,6 +37,7 @@ module.exports = (logger) => {
         ? '[:traceId][:spanId] :method :url'
         : function (tokens, req, res) {
           return JSON.stringify({
+            correlationId: tokens.correlationId(req, res),
             traceId: tokens.traceId(req, res),
             spanId: tokens.spanId(req, res),
             method: tokens.method(req, res),
@@ -65,6 +70,7 @@ module.exports = (logger) => {
         ? '[:traceId][:spanId] :status :res[content-length] - :response-time ms'
         : function (tokens, req, res) {
           return JSON.stringify({
+            correlationId: tokens.correlationId(req, res),
             traceId: tokens.traceId(req, res),
             spanId: tokens.spanId(req, res),
             status: Number.parseFloat(tokens.status(req, res) || '0.0'),
