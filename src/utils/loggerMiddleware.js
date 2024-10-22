@@ -1,6 +1,7 @@
 module.exports = (logger) => {
   return function (request, response, next) {
     const reqId = {
+      correlationId: request.correlationId,
       traceId: request.traceId,
       spanId: request.spanId
     }
