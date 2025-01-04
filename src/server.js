@@ -3,13 +3,13 @@
  * i.e. Middleware and Routes
  */
 const express = require('express')
-const Logger = require('@utils/winston')
-const requestId = require('@utils/request-id')
 const swaggerUi = require('swagger-ui-express')
+const Logger = require('@mccann-hub/json-logger').default
 const swaggerValidator = require('@utils/validator')
 const openapiSpecification = require('@utils/swagger')
-const loggerMiddleware = require('@utils/loggerMiddleware')
-const { requestMorgan, responseMorgan } = require('@utils/morgan')(Logger())
+const { dexter, requestId, requestLogger } = require('@mccann-hub/express-log-smith')
+
+const { requestMorgan, responseMorgan } = dexter(Logger())
 
 const app = express()
 
@@ -21,7 +21,9 @@ app.use(requestId())
 app.use(requestMorgan)
 app.use(responseMorgan)
 
-app.use(loggerMiddleware(Logger()))
+// body parser
+
+app.use(requestLogger(Logger()))
 
 app.use(swaggerValidator(openapiSpecification))
 /* END Middlewares */
@@ -41,20 +43,22 @@ app.use('/swagger.json', (req, res) => {
   res.json(openapiSpecification)
 })
 
-const swaggerOptions = {
-  swaggerOptions: {
-    url: '/swagger.json',
-    validatorUrl: 'localhost'
+if (['local', 'dev', 'develop', 'development'].includes(process.env.NODE_ENV || 'development')) {
+  const swaggerOptions = {
+    swaggerOptions: {
+      url: '/swagger.json',
+      validatorUrl: 'localhost'
+    }
   }
-}
 
-app.use('/docs',
-  swaggerUi.serveFiles(null, swaggerOptions),
-  swaggerUi.setup(null, {
-    ...swaggerOptions,
-    explorer: false
-  })
-)
+  app.use('/docs',
+    swaggerUi.serveFiles(undefined, swaggerOptions),
+    swaggerUi.setup(undefined, {
+      ...swaggerOptions,
+      explorer: false
+    })
+  )
+}
 /* END Swagger */
 
 module.exports = app

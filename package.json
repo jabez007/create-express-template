@@ -45,20 +45,18 @@
     "supertest": "^7.0.0"
   },
   "dependencies": {
+    "@mccann-hub/express-log-smith": "^0.1.2",
+    "@mccann-hub/json-logger": "^0.1.2",
+    "@mccann-hub/service-agent": "^0.1.2",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "axios": "^1.7.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "module-alias": "^2.2.3",
-    "morgan": "^1.10.0",
     "path-to-regexp": "^7.1.0",
-    "short-unique-id": "^5.2.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-parser": "^10.0.3",
-    "swagger-ui-express": "^5.0.1",
-    "uuid": "^10.0.0",
-    "winston": "^3.13.1"
+    "swagger-ui-express": "^5.0.1"
   },
   "_moduleAliases": {
     "@": "./src",
