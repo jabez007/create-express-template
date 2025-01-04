@@ -17,5 +17,6 @@ npm-debug.log
 .dockerignore
 .eslint*
 .gitignore
+compose.y*ml
 Dockerfile
 README.md
