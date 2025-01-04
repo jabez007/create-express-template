@@ -36,6 +36,7 @@ jobs:
 
       - uses: jabez007/docker-kitchen/.github/shared/docker@master
         with:
+          image-name: ${{ github.event.repository.name }}
           tag: test
           prune: false
           debug: ${{ vars.pipeline_debug }}
