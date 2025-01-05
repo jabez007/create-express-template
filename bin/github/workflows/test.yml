@@ -49,7 +49,7 @@ jobs:
       - name: Run Docker container
         id: container_run
         run: |
-          CONTAINER_ID=$(docker run -d -p 80:8080 --env PORT=8080 ${{ github.repository }}:test | tail -n 1)
+          CONTAINER_ID=$(docker run -d -p 80:8080 --env PORT=8080 ${{ github.event.repository.name }}:test | tail -n 1)
           echo "CONTAINER_ID=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
 
       - name: Test Docker container
