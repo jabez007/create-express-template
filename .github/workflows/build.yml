@@ -19,4 +19,5 @@ jobs:
 
       - uses: jabez007/docker-kitchen/.github/shared/docker@master
         with:
+          image-name: ${{ github.event.repository.name }}
           debug: ${{ vars.pipeline_debug }}
