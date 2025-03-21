@@ -8,9 +8,17 @@ const server = app.listen(port, () => {
   console.log(`server started at http://localhost:${port}`)
 })
 
-process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received, closing HTTP server')
-  server.close(() => {
+const gracefulShutdown = () => {
+  console.log('Gracefully closing HTTP server')
+  server.close((err) => {
+    if (err) {
+      console.error(`Error closing HTTP server: ${err}`)
+      process.exit(1)
+    }
     console.log('HTTP server closed')
+    process.exit(0)
   })
-})
+}
+
+process.on('SIGINT', gracefulShutdown)
+process.on('SIGTERM', gracefulShutdown)

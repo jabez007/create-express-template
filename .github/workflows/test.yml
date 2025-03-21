@@ -12,11 +12,14 @@ jobs:
 
     strategy:
       matrix:
-        node_version: [18.x, 20.x, 22.x]
+        node_version:
+          - 18.x
+          - 20.x
+          - 22.x
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: jabez007/create-node-template/.github/shared/node/test@master
         with:
@@ -24,15 +27,16 @@ jobs:
 
   test_docker:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - uses: jabez007/create-express-template/.github/shared/version@master
 
-      - uses: jabez007/aws-kubectl/.github/shared/docker@master
+      - uses: jabez007/docker-kitchen/.github/shared/docker@master
         with:
+          image-name: ${{ github.event.repository.name }}
           tag: test
           prune: false
           debug: ${{ vars.pipeline_debug }}
@@ -40,14 +44,14 @@ jobs:
       - name: Load image
         run: |
           docker load --input /tmp/${{ github.event.repository.name }}.tar
-          docker image ls -a  
-    
+          docker image ls -a
+
       - name: Run Docker container
         id: container_run
         run: |
-          CONTAINER_ID=$(docker run -d -p 80:8888 ${{ github.repository }}:test | tail -n 1)
+          CONTAINER_ID=$(docker run -d -p 80:8080 --env PORT=8080 ${{ github.event.repository.name }}:test | tail -n 1)
           echo "CONTAINER_ID=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
-  
+
       - name: Test Docker container
         run: |
           sleep 10
@@ -57,13 +61,13 @@ jobs:
             echo "Ping endpoint test failed"
             exit 1
           fi
-  
+
       - name: Stop and remove Docker container
         if: always()
         run: |
           docker stop ${{ steps.container_run.outputs.CONTAINER_ID }}
           docker rm ${{ steps.container_run.outputs.CONTAINER_ID }}
-  
+
       - name: Post cleanup
         if: always()
         run: docker image prune -f

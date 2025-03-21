@@ -23,7 +23,7 @@ if (process.argv.slice(2).length > 0) {
 const projectWorkingDirectory = join(initWorkingDirectory, folderName)
 /* #### END #### */
 
-async function main () {
+async function main() {
   /*
    * make new directory and move into it
    */
@@ -58,6 +58,19 @@ async function main () {
   /* #### END #### */
 
   /*
+   * install dotENV
+   */
+  console.log('installing dotENV (this may take a while)')
+  await exec('npm install dotenv')
+
+  console.log('writing .env file')
+  await writeFile(join(projectWorkingDirectory, '.env'), 'PORT=8080')
+
+  console.log('copying development .env file')
+  await cp(join(__dirname, '..', '.env.development'), join(projectWorkingDirectory, '.env.development'))
+  /* #### END #### */
+
+  /*
    * install module-alias
    */
   console.log('installing Module Alias (this may take a while)')
@@ -80,33 +93,19 @@ async function main () {
 
   console.log('adding alias for databases')
   await exec('npm pkg set _moduleAliases.@databases=./src/connections/databases')
-
   /* #### END #### */
 
   /*
-   * install dotENV
+   * install scope packages
    */
-  console.log('installing dotENV (this may take a while)')
-  await exec('npm install --save-dev dotenv')
+  console.log('installing json-logger (this may take a while)')
+  await exec('npm install @mccann-hub/json-logger')
 
-  console.log('writing .env file')
-  await writeFile(join(projectWorkingDirectory, '.env'), 'PORT=8080')
+  console.log('installing service-agent (this may take a while)')
+  await exec('npm install @mccann-hub/service-agent')
 
-  console.log('copying development .env file')
-  await cp(join(__dirname, '..', '.env.development'), join(projectWorkingDirectory, '.env.development'))
-  /* #### END #### */
-
-  /*
-   * install Winston
-   */
-  console.log('installing Winston (this may take a while)')
-  await exec('npm install winston')
-
-  console.log('installing uuid (this may take a while)')
-  await exec('npm install uuid')
-
-  console.log('installing Short Unique Id (this may take a while)')
-  await exec('npm install short-unique-id')
+  console.log('installing express-log-smith (this may take a while)')
+  await exec('npm install @mccann-hub/express-log-smith')
   /* #### END #### */
 
   /*
@@ -117,8 +116,21 @@ async function main () {
   console.log('installing Standard ESLint config (this may take a while)')
   await exec('npm install --save-dev eslint-config-standard eslint-plugin-promise eslint-plugin-import eslint-plugin-n')
 
-  console.log('copying eslintrc file')
-  await cp(join(__dirname, '..', '.eslintrc'), join(projectWorkingDirectory, '.eslintrc'))
+  console.log('writing eslintrc file')
+  await writeFile(join(projectWorkingDirectory, '.eslintrc'), JSON.stringify({
+    extends: [
+      'eslint:recommended',
+      'standard'
+    ],
+    overrides: [
+      {
+        files: './test/**/*.{test,spec}.js',
+        rules: {
+          'no-undef': 'off'
+        }
+      }
+    ]
+  }, null, 2))
 
   console.log('writing eslintignore file')
   await writeFile(join(projectWorkingDirectory, '.eslintignore'), 'node_modules')
@@ -131,20 +143,10 @@ async function main () {
   /* #### END #### */
 
   /*
-   * install Axios
-   */
-  console.log('installing Axios (this may take a while)')
-  await exec('npm install axios')
-  /* #### END #### */
-
-  /*
    * install Express
    */
   console.log('installing ExpressJS (this may take a while)')
   await exec('npm install express')
-
-  console.log('installing Morgan (this may take a while)')
-  await exec('npm install morgan')
   /* #### END #### */
 
   /*
@@ -163,20 +165,24 @@ async function main () {
   console.log('installing Swagger JSdoc (this may take a while)')
   await exec('npm install swagger-jsdoc')
 
+  console.log('installing Swagger UI Express (this may take a while)')
+  await exec('npm install swagger-ui-express')
+  /* #### END #### */
+
+  /*
+   * Packages for validator
+   */
   console.log('installing Swagger Parser (this may take a while)')
   await exec('npm install swagger-parser')
 
   console.log('installing Path to Regexp (this may take a while)')
-  await exec('npm install path-to-regexp')
+  await exec('npm install path-to-regexp@7.2.0')
 
   console.log('installing Another JSON Validator (this may take a while)')
   await exec('npm install ajv')
 
   console.log('installing AJV Formats (this may take a while)')
   await exec('npm install ajv-formats')
-
-  console.log('installing Swagger UI Express (this may take a while)')
-  await exec('npm install swagger-ui-express')
   /* #### END #### */
 
   /*
@@ -184,9 +190,6 @@ async function main () {
    */
   console.log('installing Mocha (this may take a while)')
   await exec('npm install --save-dev mocha')
-
-  console.log('installing node-mocks-http (this may take a while)')
-  await exec('npm install --save-dev node-mocks-http')
 
   console.log('installing SuperTest (this may take a while)')
   await exec('npm install --save-dev supertest')
@@ -212,20 +215,23 @@ async function main () {
     console.log('copying dockerignore')
     await cp(join(__dirname, '..', '.dockerignore'), join(projectWorkingDirectory, '.dockerignore'))
 
-    console.log('copying Dockerfile')
-    await cp(join(__dirname, '..', 'Dockerfile'), join(projectWorkingDirectory, 'Dockerfile'))
-
     console.log('adding start:docker to scripts in package.json')
     await exec('npm pkg set scripts.start:docker="node ."')
 
+    console.log('copying Dockerfile')
+    await cp(join(__dirname, '..', 'Dockerfile'), join(projectWorkingDirectory, 'Dockerfile'))
+
     console.log('adding build:docker to scripts in package.json')
-    await exec(`npm pkg set scripts.build:docker="docker build --platform=linux/amd64 -t ${dockerUser}/${folderName}:$npm_package_version ."`)
+    await exec(`npm pkg set scripts.build:docker="docker build -t ${dockerUser}/${folderName}:$npm_package_version ."`)
 
     console.log('adding prebuild:docker to scripts in package.json')
     await exec('npm pkg set scripts.prebuild:docker="npm run lint"')
 
+    console.log('copying Docker compose')
+    await cp(join(__dirname, '..', 'compose.yml'), join(projectWorkingDirectory, 'compose.yml'))
+
     console.log('adding serve:docker to scripts in package.json')
-    await exec(`npm pkg set scripts.serve:docker="docker run --init --name ${folderName} -p 80:8080 --env-file ./.env -d ${dockerUser}/${folderName}:$npm_package_version"`)
+    await exec('npm pkg set scripts.serve:docker="docker compose up --build --watch"')
 
     /*
      * Kubernetes

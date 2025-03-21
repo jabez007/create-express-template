@@ -1,4 +1,4 @@
-const svcAgent = require('@utils/axios')
+const svcAgent = require('@mccann-hub/service-agent').default
 
 const swapiClient = svcAgent({
   axiosConfig: {
