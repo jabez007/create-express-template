@@ -44,10 +44,18 @@ spec:
               path: /ping
               port: 8080
             initialDelaySeconds: 15
-            periodSeconds: 10
+            periodSeconds: 15
           readinessProbe: # checks whether the container is ready to receive traffic
             httpGet:
               path: /ping
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
+          startupProbe: # hold off liveness and readiness probes until container is started
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 10
+            failure
